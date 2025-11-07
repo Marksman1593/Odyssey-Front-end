@@ -42,6 +42,7 @@ const InvoiceCharges = ({data, state, dispatch, companyId, reload}) => {
       pol:'',
       pod:'',
       fd:'',
+      customerRef: '',
       SE_Equipments:[]
     },
     note:''
@@ -51,6 +52,7 @@ const InvoiceCharges = ({data, state, dispatch, companyId, reload}) => {
   const [logo, setLogo] = useState(false);
   const [compLogo, setCompLogo] = useState("1");
   const [balance, setBalance] = useState(false);
+  const [note, setNote] = useState(false);
 
   let bankDetails = {
     one:`
@@ -85,6 +87,7 @@ const InvoiceCharges = ({data, state, dispatch, companyId, reload}) => {
 
   useEffect(()=>{
     if(Object.keys(data).length>0){
+      console.log(data.resultOne)
       setInvoice(data.resultOne);
       setRecords(data.resultOne?.Charge_Heads);
       setInvoiceData(!invoiceData)
@@ -393,6 +396,7 @@ const InvoiceCharges = ({data, state, dispatch, companyId, reload}) => {
       <Checkbox onChange={()=>setRef(!ref)} checked={ref} className='mb-2'>Hide Ref & Sales Rep</Checkbox><br/>
       <Checkbox onChange={()=>setLogo(!logo)} checked={logo} className='mb-2'>Hide Logo</Checkbox><br/>
       <Checkbox onChange={()=>setBalance(!balance)} checked={balance} className='mb-2'>Hide Balance</Checkbox><br/>
+      <Checkbox onChange={()=>setNote(!note)} checked={note} className='mb-2'>Hide Note</Checkbox><br/>
       Logo: {" "}
       <Radio.Group optionType="button" buttonStyle="solid" value={compLogo}
         options={[{ label: 'SNS', value: '1' }, { label: 'ACS', value: '2' }]}
@@ -651,7 +655,7 @@ return (
           <Col className='mx-2 pt-3' md={4}>
               <h5>Note</h5>
               <div style={{border:"1px solid silver"}}>
-                <TextArea rows={4} value={invoice?.note} onChange={(e)=>setInvoice({...invoice, note:e.target.value})} />
+                <TextArea showCount rows={4} value={invoice?.note} onChange={(e)=>setInvoice({...invoice, note:e.target.value})} />
               </div>
               <button className='btn-custom mt-3' onClick={updateNote} type='button'>Save</button>
           </Col>
@@ -686,7 +690,7 @@ return (
             
           </Col>
           }
-          <Col md={2}>
+          <Col md={3}>
             <span className='inv-label mx-2'>Total Amount {"(Local)"}:</span>
             <span className='inv-value charges-box'> 
               {" "}
@@ -724,7 +728,9 @@ return (
               records={records} 
               bank={bank} 
               bankDetails={bankDetails} 
-              invoice={invoice} 
+              invoice={invoice}
+              note={note} 
+              reference={ref}
               calculateTotal={calculateTotal} 
             /> 
           :

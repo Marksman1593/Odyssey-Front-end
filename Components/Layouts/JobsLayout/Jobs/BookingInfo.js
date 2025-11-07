@@ -375,6 +375,11 @@ const BookingInfo = ({ handleSubmit, onEdit, companyId, register, control, error
             options={state.fields.sr} width={"100%"} />
         </Col>
         <Col md={3}><Space />
+        {(type == "SE" || type == "SI") && <>
+            <div className='custom-link mt-2' onClick={() => pageLinking("vendor", shippingLineId)} >Sline/Carrier</div>
+            <SelectSearchComp register={register}
+              clear={true} name='shippingLineId' control={control} label='' disabled={getStatus(approved)} options={state.fields.vendor.sLine} width={"100%"} />
+          </>}
           <div className='custom-link mt-2' onClick={() => pageLinking("vendor", overseasAgentId)} >Overseas Agent *</div>
           <SelectSearchComp register={register}
             clear={true}
@@ -388,11 +393,6 @@ const BookingInfo = ({ handleSubmit, onEdit, companyId, register, control, error
             name='localVendorId' control={control} label=''
             disabled={getStatus(approved)} options={state.fields.vendor.localVendor} width={"100%"}
           />
-          {(type == "SE" || type == "SI") && <>
-            <div className='custom-link mt-2' onClick={() => pageLinking("vendor", shippingLineId)} >Sline/Carrier</div>
-            <SelectSearchComp register={register}
-              clear={true} name='shippingLineId' control={control} label='' disabled={getStatus(approved)} options={state.fields.vendor.sLine} width={"100%"} />
-          </>}
           {(type == "AE" || type == "AI") && <>
             <div className='custom-link mt-2' onClick={() => pageLinking("vendor", airLineId)} >Air line *</div>
             <SelectSearchComp register={register}

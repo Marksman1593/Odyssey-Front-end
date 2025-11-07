@@ -422,6 +422,7 @@ const MainLayout = ({children}) => {
     else if(x.key=='6-1'){ Router.push('/tasks/riders') }
     else if(x.key=='6-2'){ Router.push(`/tasks/riders/riderAssign/${setKey(x)}`) }
     else if(x.key=='6-3'){ Router.push(`/tasks/list`) }
+    else if(x.key=='6-4'){ Router.push(`/tasks/tracking`) }
     else if(x.key=='7-1'){ Router.push('/airJobs/aeJobList') }
     else if(x.key=='7-2'){ Router.push(`/airJobs/export/${setKey(x)}`) } //these routes are also settled in 2nd useEffect
     else if(x.key=='7-3'){ Router.push(`/airJobs/export/bl/${setKey(x)}`) } //these routes are also settled in 2nd useEffect

@@ -6,7 +6,9 @@ import airports from "/jsonData/airports";
 import inWords from '/functions/numToWords';
 import Cookies from 'js-cookie';
 
-const InvoicePrint = ({logo, compLogo, records, bank, bankDetails, invoice, calculateTotal}) => {
+const commas = (a) => parseFloat(a).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+const InvoicePrint = ({logo, compLogo, records, bank, bankDetails, invoice, note, reference, calculateTotal}) => {
 
     const [type, setType] = useState("PP")
 
@@ -111,16 +113,17 @@ const InvoicePrint = ({logo, compLogo, records, bank, bankDetails, invoice, calc
             {/* <div style={paraStyles}>{invoice.SE_Job.consignee?.mobile1}</div> */}
         </Col>
     </Row>
-    <Row style={{paddingLeft:12, paddingRight:12}}>
+    {!reference && <Row style={{paddingLeft:12, paddingRight:12}}>
         <Col md={6} style={{borderRight:border, borderLeft:border, borderBottom:border}} className='p-0 px-1'>
             <span style={heading}>Reference No.</span>
-            
+            {console.log(invoice?.SE_Job)}
+            <span style={{...paraStyles, paddingLeft:70}}>{invoice?.SE_Job?.customerRef}</span>
         </Col>
         <Col md={6} style={{borderRight:border, borderBottom:border}} className='p-0 px-1'>
             <span style={heading}>Sales Rep</span>
             <span style={{...paraStyles, paddingLeft:70}}>{invoice?.SE_Job?.sales_representator?.name}</span>
         </Col>
-    </Row>
+    </Row>}
     <Row style={{paddingLeft:12, paddingRight:12}}>
         <Col md={6} style={{borderRight:border, borderLeft:border, borderBottom:border}} className='p-1'>
             <Row>
@@ -180,7 +183,7 @@ const InvoicePrint = ({logo, compLogo, records, bank, bankDetails, invoice, calc
                             </>
                             :
                             <>
-                                {invoice.SE_Job?.departureDate?moment(invoice.SE_Job?.departureDate).format("DD-MMM-YYYY"):''}
+                                {invoice.SE_Job?.shipDate?moment(invoice.SE_Job?.shipDate).format("DD-MMM-YYYY"):''}
                             </>
                         }
                     </div>
@@ -196,16 +199,17 @@ const InvoicePrint = ({logo, compLogo, records, bank, bankDetails, invoice, calc
                 <Col md={5}>
                     <div style={heading}>Invoice Date</div>
                     <div style={paraStyles}>
-                        {
+                        {/* {
                             (invoice.operation=="AI"||invoice.operation=="SI") ?
                             <>
-                                {invoice.SE_Job?.arrivalDate?moment(invoice.SE_Job?.arrivalDate).format("DD-MMM-YYYY"):''}
+                                {invoice.createdAt?moment(invoice.createdAt).format("DD-MMM-YYYY"):''}
                                 </>
                             :
                             <>
                                 {invoice.SE_Job?.departureDate?moment(invoice.SE_Job?.departureDate).format("DD-MMM-YYYY"):''}
                             </>
-                        }
+                        } */}
+                        {invoice.createdAt?moment(invoice.createdAt).format("DD-MMM-YYYY"):''}
                     </div>
                 </Col>
             </Row>
@@ -223,7 +227,7 @@ const InvoicePrint = ({logo, compLogo, records, bank, bankDetails, invoice, calc
                 <Col md={5}>
                     <div style={heading}>Port of Discharge</div>
                     <div style={paraStyles}>
-                        {(invoice.operation=="SE"||invoice.operation=="SI")? getPort(invoice.SE_Job?.pod):getAirPort(invoice.SE_Job?.pod)}
+                        {(invoice.operation=="SE"||invoice.operation=="SI")? getPort(invoice.SE_Job?.pod)||invoice.SE_Job?.pod:getAirPort(invoice.SE_Job?.pod)||invoice.SE_Job?.pod}
                     </div>
                 </Col>
             </Row>
@@ -264,8 +268,8 @@ const InvoicePrint = ({logo, compLogo, records, bank, bankDetails, invoice, calc
                         {invoice?.payType=="Recievable" &&<>
                             {
                             (invoice.operation=="SE"||invoice.operation=="SI")?
-                                parseFloat(invoice?.SE_Job?.vol).toFixed(2):
-                                parseFloat(invoice?.SE_Job?.cwtClient).toFixed(2)
+                                commas(parseFloat(invoice?.SE_Job?.vol).toFixed(2)):
+                                commas(parseFloat(invoice?.SE_Job?.cwtClient).toFixed(2))
                             }
                         </>}
                         {invoice?.payType!="Recievable" && <>0.00</>}
@@ -274,7 +278,7 @@ const InvoicePrint = ({logo, compLogo, records, bank, bankDetails, invoice, calc
                 <Col md={4}>
                     <div style={heading}>Weight</div>
                     <div style={paraStyles}>
-                        {invoice.SE_Job?.weight?parseFloat(invoice.SE_Job?.weight).toFixed(2):"0.00"}
+                        {invoice.SE_Job?.weight?commas(parseFloat(invoice.SE_Job?.weight).toFixed(2)):"0.00"}
                     </div>
                 </Col>
                 <Col md={4}>
@@ -308,7 +312,7 @@ const InvoicePrint = ({logo, compLogo, records, bank, bankDetails, invoice, calc
                 </Col>
                 <Col md={5}>
                     <div style={heading}>Exchange Rate</div>
-                    <div style={paraStyles}>{records.length>0?records[0].ex_rate:''}</div>
+                    <div style={paraStyles}>{records.length>0?commas(records[0].ex_rate):''}</div>
                 </Col>
             </Row>
         </Col>
@@ -354,18 +358,18 @@ const InvoicePrint = ({logo, compLogo, records, bank, bankDetails, invoice, calc
     <tr key={index} className='table-row-center-singleLine' style={{border:'1px solid black', fontSize:9}}>
         <td className='text-center p-0'>{index + 1}</td>
         <td className='text-center p-0'>{x.particular}</td>
-        <td className='text-center p-0'>{x.qty}</td>
-        <td className='text-center p-0'>{x.rate_charge}</td>
+        <td className='text-center p-0'>{commas(x.qty)}</td>
+        <td className='text-center p-0'>{commas(x.rate_charge)}</td>
         <td className='text-center p-0'>{x.currency}</td>
         {x.pp_cc=="CC"?<td className='text-center p-0'>{x.type=="Recievable"?"DN":"CN"}</td>:null}
-        <td className='text-center p-0'>{x.amount}</td>
-        <td className='text-center p-0'>{x.discount}</td>
-        <td className='text-center p-0'>{x.tax_amount}</td>
+        <td className='text-center p-0'>{commas(x.amount)}</td>
+        <td className='text-center p-0'>{commas(x.discount)}</td>
+        <td className='text-center p-0'>{commas(x.tax_amount)}</td>
         <td className='text-center p-0'>
             {
             (invoice.type=="Agent Invoice"||invoice.type=="Agent Bill")?
                 (parseFloat(x.local_amount)/parseFloat(x.ex_rate)).toFixed(2):
-                x.local_amount
+                commas(x.local_amount)
             }
             </td>
     </tr>
@@ -405,12 +409,13 @@ const InvoicePrint = ({logo, compLogo, records, bank, bankDetails, invoice, calc
     </Row>
     <Row className='mx-0'>
         <Col md={6} className='p-1' style={{borderRight:border, borderLeft:border, borderBottom:border, fontSize:12}}>
-            <b className='fw-8'>Note</b>
+        <b className='fw-8'>Note</b>
+        {!note &&<>
             <div style={{minHeight:60, lineHeight:1}} >
                 {invoice?.note?.length>40 && 
                 <div className="bl-print" style={{color:'black', whiteSpace:'pre-wrap'}}>{invoice.note}</div>
                 }
-            </div>
+            </div></>}
         </Col>
         <Col md={6} className='p-1' style={{borderRight:border, borderBottom:border, fontSize:12}}>
             <b className='fw-8'>In-Words</b>
@@ -434,10 +439,10 @@ const InvoicePrint = ({logo, compLogo, records, bank, bankDetails, invoice, calc
     </Row>
     <div style={{position:'fixed', bottom:30, width:'90vw'}}>
         <Row className='justify-content-center'>
-            <Col md={4} className='fs-10'></Col>
-            <Col md={4} className='fs-10'></Col>
-            <Col md={4} className='text-center'>
-                <div>____________________</div>
+            <Col md={3} className='fs-10'></Col>
+            <Col md={3} className='fs-10'></Col>
+            <Col md={6} className='text-center'>
+                <div>__________________________</div>
                 <div className='fs-12 px-5'><b>{compLogo=="1"?"SEA NET SHIPPING & LOGISTICS":"AIR CARGO SERVICES"}</b></div>
             </Col>
         </Row>

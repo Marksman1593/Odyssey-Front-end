@@ -26,36 +26,42 @@ const Upload_CoA = () => {
         // await importCharges()
         // await importParties()
         await importJobs()
-        // await importVouchers()
+        await importVouchers()
+        // await checkInvoices()
         // await importAirPorts()
         // await importEmployees()
         // await importAECharges()
     }
 
     const [invoicesData, setInvoices] = useState([]);
-    const [partiesAccounts1, setPartiesAccounts] = useState({
-        "Clients": [],
-        "Vendors": [],
-        "Clients/Vendors": [],
-        "nonGlParties": []
-    });
-
-    let partiesAccounts = {
-        "Clients": [],
-        "Vendors": [],
-        "Clients/Vendors": [],
-        "nonGlParties": []
-    }
-    const [withAccounts1, setWithAccounts] = useState([]);
-    let withAccounts = []
-    let withoutAccounts = []
-    const [status, setStatus] = useState("Waiting for file");
-    const [statusInvoices, setStatusInvoices] = useState("Waiting for file");
-    const [statusInvoiceMatching, setStatusInvoiceMatching] = useState("Waiting for file");
     const [C, setClients] = useState(false);
     const [V, setVendors] = useState(false);
     const [CV, setCV] = useState(false);
     const [GL, setNonGl] = useState(false);
+
+    const checkInvoices = async () => {
+        console.log("Getting Invoices")
+        const { data } = await axios.post("http://localhost:8081/voucher/getAllInvoices");
+        console.log(data.Invoices)
+        const result = await axios.get("http://localhost:8082/invoice/invoiceMatching");
+        console.log(result.data.result)
+
+        const createMap = (arr, key) => new Map(arr.map(item => [item[key], item]));
+
+        const map = createMap(result.data.result, 'invoice_No');
+        
+        const invoices = []
+
+        data.Invoices.forEach(element => {
+            if(!map.has(element.InvoiceNumber)){
+                // console.log(element.invoice_No)
+                invoices.push(element.InvoiceNumber)
+            }
+        });
+
+        console.log(invoices)
+        
+    }
 
     useEffect(() => {
         if(C && V){
@@ -423,7 +429,7 @@ const importVouchers = async () => {
         };
 
         await sendBatches(linkedVouchers, "http://localhost:8082/voucher/importVouchers", 100);
-        await sendBatches(unlinkedVouchers, "http://localhost:8082/voucher/importV", 100);
+        await sendBatches(Vouchers, "http://localhost:8082/voucher/importV", 100);
         
 
     }catch(e){
@@ -572,7 +578,7 @@ const filterData = (map, filter) => {
 const importJobs = async () => {
     try{
         console.log("Fetching Air Jobs data")
-        // const { data } = await axios.get("http://localhost:8081/jobs/getAll");
+        const { data } = await axios.get("http://localhost:8081/jobs/getAll");
         console.log("Air Job Data:", data)
 
         const createMap = (arr, key) => new Map(arr.map(item => [item[key], item]));
@@ -925,7 +931,7 @@ const importJobs = async () => {
 
     try{
         console.log("Fetching SE Job data")
-        // const { data } = await axios.get("http://localhost:8081/jobs/getAllSE");
+        const { data } = await axios.get("http://localhost:8081/jobs/getAllSE");
         console.log("SE Job Data:", data)
 
         const createMap = (arr, key) => new Map(arr.map(item => [item[key], item]));
@@ -1166,7 +1172,7 @@ const importJobs = async () => {
 
     try{
         console.log("Fetching SI Job data")
-        // const { data } = await axios.get("http://localhost:8081/jobs/getAllSI");
+        const { data } = await axios.get("http://localhost:8081/jobs/getAllSI");
         console.log("SI Job Data:", data)
 
         const createMap = (arr, key) => new Map(arr.map(item => [item[key], item]));
@@ -1534,7 +1540,7 @@ const importJobs = async () => {
             console.log("🎉 All batches processed for", url);
         };
 
-        // await sendBatches(Invoices, "http://localhost:8082/voucher/importI", 100);
+        await sendBatches(Invoices, "http://localhost:8082/voucher/importI", 100);
 
     }catch(e){
         console.error(e)

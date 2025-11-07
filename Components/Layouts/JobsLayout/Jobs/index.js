@@ -37,6 +37,7 @@ const SeJob = ({id, type}) => {
         payload:{
           fields:data.result,
           selectedRecord:dataSuccess?temp:{},
+          equipments:dataSuccess?temp.SE_Equipments?.length>0?temp.SE_Equipments:state.equipments:[],
           fetched:true,
           edit:id=="new"?false:true,
           // permissions:tempPerms
