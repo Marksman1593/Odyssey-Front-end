@@ -304,7 +304,8 @@ const BookingInfo = ({ handleSubmit, onEdit, companyId, register, control, error
       <Row style={{ fontSize: 12 }}>
         <Col md={3} className=''>
           <div className='custom-link mt-2' onClick={() => pageLinking("client", ClientId)} >Client *</div>
-          <SelectSearchComp register={register}
+          {errors.ClientId && <p className='text-danger'>{errors.ClientId.message}</p>}
+          <SelectSearchComp register={register("ClientId", { required: "Client is required" })}
             clear={true}
             name='ClientId' control={control} label='' disabled={getStatus(approved)} width={"100%"}
             options={state.fields.party.client} />
@@ -312,6 +313,7 @@ const BookingInfo = ({ handleSubmit, onEdit, companyId, register, control, error
           {(type == "SE" || type == "AE") && <SelectSearchComp register={register} clear={true} name='shipperId' control={control} label='' disabled={getStatus(approved)} width={"100%"} options={state.fields.party.shipper} />}
           <div className='custom-link mt-2'
             onClick={() => pageLinking("client", consigneeId)} >Consignee *</div>
+            {errors.consigneeId && <p className='text-danger'>{errors.consigneeId.message}</p>}
           <SelectSearchComp register={register} clear={true} name='consigneeId' control={control} label='' disabled={getStatus(approved)} width={"100%"} options={state.fields.party.consignee} />
           <Space />
           {(type == "SI" || type == "AI") && <div className='custom-link mt-2' onClick={() => pageLinking("client", shipperId)}>Shipper *</div>}

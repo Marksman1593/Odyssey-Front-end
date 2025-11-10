@@ -4,7 +4,10 @@ import moment from "moment";
 import { delay } from "/functions/delay";
 import openNotification from "../../../Shared/Notification";
 
-const SignupSchema = yup.object().shape({  });
+const SignupSchema = yup.object().shape({
+  ClientId: yup.string().required("Client is required"),
+  consigneeId: yup.string().required("Consignee is required"),
+});
 
 function recordsReducer(state, action){
   switch (action.type) {
