@@ -9,7 +9,7 @@ import ExcelJS from "exceljs";
 const Report = ({query, result}) => {
   const reportView = query.reportType;
   const option = query.options;
-  // console.log(result)
+  console.log("Result", result)
     const [ records, setRecords ] = useState([]);
     const [ total, setTotal ] = useState({
       opDebit:0,
@@ -106,13 +106,13 @@ const Report = ({query, result}) => {
       if(result.result.length>0){
 
         result?.result?.forEach((x)=>{
-          if(x?.Child_Accounts?.length>0){
+          if(x?.children?.length>0){
             temp.push({
               title:x.title, type:'parent', code:x.code,
-              ...makeParentTransaction(x?.Child_Accounts)
+              ...makeParentTransaction(x?.children)
             });
             let type = "Non-EX"
-            x.Child_Accounts.forEach((y)=>{
+            x.children.forEach((y)=>{
               // console.log("Accounts", y)
               y.title.includes("EX-CHANGE RATE GAIN / LOSS")?type = "EX":null
               temp.push({

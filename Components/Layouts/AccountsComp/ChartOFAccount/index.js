@@ -1,377 +1,397 @@
-import React, { useEffect, useReducer } from 'react';
+import React, { useEffect, useReducer, useCallback } from 'react';
 import { Row, Col } from 'react-bootstrap';
 import CreateOrEdit from './CreateOrEdit';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import ExcelJS from "exceljs";
 
-
 import { PlusCircleOutlined, MinusCircleOutlined, RightOutlined, EditOutlined } from '@ant-design/icons';
 import { Modal } from 'antd';
 
-function recordsReducer(state, action){
-    switch (action.type) {
-      case 'toggle': { return { ...state, [action.fieldName]: action.payload } }
-      case 'create': {
-        return {
-            ...state,
-            create: true,
-            visible: true,
-        }
-      }
-      case 'edit': {
-        return {
-            ...state,
-            edit: true,
-            visible: true,
-        }
-      }
-      case 'modalOff': {
-        return {
-            ...state,
-            visible: false,
-            create: false,
-            edit: false
-        }
-      }
-      default: return state 
+/* -------------------- reducer -------------------- */
+function recordsReducer(state, action) {
+  switch (action.type) {
+    case 'toggle': {
+      return { ...state, [action.fieldName]: action.payload };
     }
+    case 'create': {
+      return {
+        ...state,
+        create: true,
+        visible: true,
+      };
+    }
+    case 'edit': {
+      return {
+        ...state,
+        edit: true,
+        visible: true,
+      };
+    }
+    case 'modalOff': {
+      return {
+        ...state,
+        visible: false,
+        create: false,
+        edit: false,
+      };
+    }
+    default:
+      return state;
+  }
 }
 
 const initialState = {
-    records: [],
-    load:true,
-    visible:false,
-    create:false,
-    edit:false,
-    
-    // Createing Records
-    selectedMainId:'',
-    selectedParentId:'',
-    title:'',
-    isParent:false,
-    subCategory:"General",
-    parentRecords: [],
-    
-    // Editing Records
-    selectedRecordId:'',
-    selectedRecord:{}
+  records: [],
+  load: true,
+  visible: false,
+  create: false,
+  edit: false,
+
+  // Creating Records
+  selectedMainId: '',
+  selectedParentId: '',
+  title: '',
+  isParent: false,
+  subCategory: "General",
+  parentRecords: [],
+
+  // Editing Records
+  selectedRecordId: '',
+  selectedRecord: {}
 };
 
-const ChartOFAccount = ({accountsData}) => {
+/* -------------------- helpers -------------------- */
+const getChildrenArray = (node) => {
+  // accommodate both data shapes: node.children OR node.Child_Accounts
+  if (!node) return [];
+  return Array.isArray(node.children)
+    ? node.children
+    : Array.isArray(node.Child_Accounts)
+      ? node.Child_Accounts
+      : [];
+};
 
-    const [ state, dispatch ] = useReducer(recordsReducer, initialState);
-    const { records, visible } = state;
-    useEffect(() => { 
-        getAccounts(accountsData)
-     }, []);
+const addCheckRecursively = (nodes) => {
+  if (!Array.isArray(nodes)) return [];
+  return nodes.map(n => ({
+    ...n,
+    check: !!n.check,
+    children: addCheckRecursively(getChildrenArray(n)) // normalize into .children for internal use
+  }));
+};
 
-    async function getAccounts(data){
-        let tempState = [];
-        let tempStateTwo = [];
-        data.result.forEach((x, index) => {
-            tempState[index]={
-                ...x,
-                check:false
-            }
-            x.Parent_Accounts.forEach((y, indexTwo) => {
-                tempState[index].Parent_Accounts[indexTwo]={
-                    ...y,
-                    check:false
-                }
-                tempStateTwo.push(y)
-            })
-        });
-        dispatch({ type: 'toggle', fieldName: 'records', payload: tempState })
-        dispatch({ type: 'toggle', fieldName: 'parentRecords', payload: tempStateTwo })
+/* -------------------- main component -------------------- */
+const ChartOFAccount = ({ accountsData }) => {
+  const [state, dispatch] = useReducer(recordsReducer, initialState);
+  const { records, visible } = state;
+
+  /* -------------------- load accounts -------------------- */
+  const getAccounts = useCallback(async (data) => {
+    try {
+      if (!data) return;
+
+      // support both top-level shapes: data.result or data (if passed directly)
+      const source = data.result ?? data;
+
+      // clone and normalize: ensure each node has .children (converted from Child_Accounts if needed)
+      const normalized = addCheckRecursively(source);
+
+      // flatten parent records (second-level) for dropdowns if needed
+      const parentRecordsFlat = [];
+      normalized.forEach((x) => {
+        (x.children || []).forEach((y) => parentRecordsFlat.push(y));
+      });
+
+      // update state
+      dispatch({ type: 'toggle', fieldName: 'records', payload: normalized });
+      dispatch({ type: 'toggle', fieldName: 'parentRecords', payload: parentRecordsFlat });
+    } catch (err) {
+      console.error('getAccounts error:', err);
     }
+  }, []);
 
-    const updateCodeParents = async () => {
-        let tempState = [...state.records];
-        let p = 0;
-        let c = 0;
-    
-        for (let x of tempState) {
-            p = parseInt(x.id * 100);
-            for (let y of x.Parent_Accounts) {
-                p++;
-                let codeP = Cookies.get('companyId').toString() + p.toString();
-                try {
-                    const response = await axios.post(process.env.NEXT_PUBLIC_CLIMAX_POST_CODE_PARENT_ACCOUNT, {
-                        id: y.id,
-                        title: y.title,
-                        AccountId: y.AccountId,
-                        CompanyId: Cookies.get('companyId'),
-                        code: codeP.toString()
-                    });
-                } catch (error) {
-                    console.error("Error updating parent account:", error);
-                }
-    
-    
-                c = p * 10000;
-                for (let z of y.Child_Accounts) {
-                    c++;
-                    let codeC = Cookies.get('companyId').toString() + c.toString();
-                    try {
-                        const response = await axios.post(process.env.NEXT_PUBLIC_CLIMAX_POST_CODE_CHILD_ACCOUNT, {
-                            id: z.id,
-                            title: z.title,
-                            ParentAccountId: y.id,
-                            CompanyId: Cookies.get('companyId'),
-                            code: codeC.toString()
-                        });
-                    } catch (error) {
-                        console.error("Error updating child account:", error);
-                    }
-                }
-    
-                c = 0;
-            }
-    
-            p = 0;
-        }
-    
-    };
+  useEffect(() => {
+    if (accountsData) getAccounts(accountsData);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [accountsData, getAccounts]);
 
-    const ImageToBlob = (imageUrl) => {
-        return new Promise((resolve, reject) => {
-          const img = new Image();
-          img.crossOrigin = 'anonymous'; // Enable CORS if required
-          img.onload = () => {
-            const canvas = document.createElement('canvas');
-            canvas.width = img.width;
-            canvas.height = img.height;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0);
-            canvas.toBlob(resolve);
-          };
-          img.onerror = reject;
-          img.src = imageUrl;
-        });
-      };
+  /* -------------------- update codes (kept as-is) -------------------- */
+  const updateCodeParents = async () => {
+    let tempState = [...state.records];
+    let p = 0;
+    let c = 0;
 
-    const exportToExcel = async () => {
-        const workbook = new ExcelJS.Workbook();
-        const worksheet = workbook.addWorksheet('Invoice Report');
-      
-        // Column definitions
-        worksheet.columns = [
-          { header: 'Code', key: 'code', width: 15 },
-          { header: 'Account Title', key: 'title', width: 35  },
-          { header: 'Type', key: 'type', width: 15  },
-          { header: 'Category', key: 'cat', width: 15  },
-          { header: 'Sub Category', key: 'subCat', width: 15  },
-        ];
-    
-        const headerRow = worksheet.getRow(1);
-        headerRow.eachCell((cell) => {
-          cell.fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: 'D3D3D3' } 
-          };
-          cell.border = {
-            right: { style: 'thin', color: { argb: '000000' } },
-            left: { style: 'thin', color: { argb: '000000' } },
-            top: { style: 'thin', color: { argb: '000000' } },
-            bottom: { style: 'thin', color: { argb: '000000' } },
-          }
-          cell.font = {
-            bold: true,
-          };
-        
-          cell.alignment = {
-            horizontal: 'center',
-            vertical: 'middle'
-          };
-        });
-
-        let data1 = []
-
-        records.forEach((x, i)=>{
-            data1.push({
-                index: i + 1,
-                code: x.code,
-                title: x.title,
-                type: "Group"
-            })
-            x.Parent_Accounts.forEach((y, index)=>{
-                data1.push({
-                    index: i + 1,
-                    code: y.code,
-                    title: y.title,
-                    type: "Parent",
-                    cat: x.title
-                })
-                y.Child_Accounts.forEach((z, indexTwo)=>{
-                    data1.push({
-                        index: i + 1,
-                        code: z.code,
-                        title: z.title,
-                        type: "Child",
-                        cat: x.title,
-                        subCat: z.subCategory
-                    })
-                })
-            })
-        })
-        
-        console.log(data1)
-          worksheet.addRows(data1);
-          worksheet.insertRow(1, ['']);
-          worksheet.insertRow(1, ['']);
-        //   worksheet.insertRow(1, ['', '', '', 'Date: From: ' + query.from + ' To: ' + query.to,]);
-          worksheet.insertRow(1, ['', '', 'House# D-213, DMCHS, Siraj Ud Daula Road, Karachi']);
-          Cookies.get('companyId')=='1' && worksheet.insertRow(1, ['', '', 'Seanet Shipping & Logistics']);
-          Cookies.get('companyId')=='2' && worksheet.insertRow(1, ['', '', 'Air Cargo Services']);
-        //   Cookies.get('companyId')!='1' && query.company!='2' && worksheet.insertRow(1, ['', '', '', 'Seanet Shipping & Logistics & Air Cargo Services']);
-          worksheet.insertRow(1, ['']);
-          worksheet.insertRow(1, ['']);
-    
-        worksheet.getCell('C3').font = {
-          size: 16,  // Increase font size
-          bold: true  // Make the text bold
-        };
-        worksheet.getCell('C4').font = {
-          size: 16,  // Increase font size
-          bold: true  // Make the text bold
-        };
-    
-        const imageUrl = Cookies.get('companyId')=='1' ? '/seanet-colored.png' : Cookies.get('companyId')=='2' ? '/acs-colored.png' : '/sns-acs.png';
-    
-        // const imageUrl = '/public/seanet-logo-complete.png'
-        const imageBlob = await ImageToBlob(imageUrl);
-    
-        const imageId = workbook.addImage({
-          buffer: await imageBlob.arrayBuffer(), // Convert Blob to ArrayBuffer
-          extension: 'png', // Image extension
-        });
-    
-        worksheet.addImage(imageId, {
-          tl: { col: 1, row: 1 }, // Top-left position (column, row)
-          ext: { width: 150, height: 100 }, // Image width and height
-        });
-    
-        try{
-          const buffer = await workbook.xlsx.writeBuffer();
-          const blob = new Blob([buffer], {
-            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    for (let x of tempState) {
+      p = parseInt(x.id * 100);
+      for (let y of getChildrenArray(x)) {
+        p++;
+        let codeP = Cookies.get('companyId').toString() + p.toString();
+        try {
+          await axios.post(process.env.NEXT_PUBLIC_CLIMAX_POST_CODE_PARENT_ACCOUNT, {
+            id: y.id,
+            title: y.title,
+            AccountId: y.AccountId,
+            CompanyId: Cookies.get('companyId'),
+            code: codeP.toString()
           });
-          const url = window.URL.createObjectURL(blob);
-          const link = document.createElement('a');
-          link.href = url;
-          link.download = 'ChartOfAccounts.xlsx';
-          link.click();
-          window.URL.revokeObjectURL(url);
-        }catch(e){
-          console.log(e)
-          console.error(e)
+        } catch (error) {
+          console.error("Error updating parent account:", error);
         }
-      
-        
+
+        c = p * 10000;
+        for (let z of getChildrenArray(y)) {
+          c++;
+          let codeC = Cookies.get('companyId').toString() + c.toString();
+          try {
+            await axios.post(process.env.NEXT_PUBLIC_CLIMAX_POST_CODE_CHILD_ACCOUNT, {
+              id: z.id,
+              title: z.title,
+              ParentAccountId: y.id,
+              CompanyId: Cookies.get('companyId'),
+              code: codeC.toString()
+            });
+          } catch (error) {
+            console.error("Error updating child account:", error);
+          }
+        }
+
+        c = 0;
+      }
+
+      p = 0;
+    }
+  };
+
+  /* -------------------- Image to Blob for Excel header -------------------- */
+  const ImageToBlob = (imageUrl) => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        canvas.toBlob(resolve);
+      };
+      img.onerror = reject;
+      img.src = imageUrl;
+    });
+  };
+
+  /* -------------------- Export to Excel -------------------- */
+  const exportToExcel = async () => {
+    try {
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet('Chart Of Accounts');
+
+      worksheet.columns = [
+        { header: 'Code', key: 'code', width: 15 },
+        { header: 'Account Title', key: 'title', width: 35 },
+        { header: 'Type', key: 'type', width: 15 },
+        { header: 'Category', key: 'cat', width: 20 },
+        { header: 'Sub Category', key: 'subCat', width: 20 },
+      ];
+
+      const headerRow = worksheet.getRow(1);
+      headerRow.eachCell((cell) => {
+        cell.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: 'D3D3D3' }
+        };
+        cell.border = {
+          right: { style: 'thin', color: { argb: '000000' } },
+          left: { style: 'thin', color: { argb: '000000' } },
+          top: { style: 'thin', color: { argb: '000000' } },
+          bottom: { style: 'thin', color: { argb: '000000' } },
+        };
+        cell.font = { bold: true };
+        cell.alignment = { horizontal: 'center', vertical: 'middle' };
+      });
+
+      const rows = [];
+
+      // iterate recursively and build rows
+      const walk = (node, topTitle = null) => {
+        if (!node) return;
+        const type = topTitle == null ? 'Group' : node.children?.length ? 'Parent' : 'Child';
+        rows.push({
+          code: node.code ?? '',
+          title: node.title ?? '',
+          type,
+          cat: topTitle ?? '',
+          subCat: node.subCategory ?? ''
+        });
+
+        const children = getChildrenArray(node);
+        children.forEach(child => walk(child, topTitle == null ? node.title : topTitle));
       };
 
-    console.log(records)
+      records.forEach(group => {
+        walk(group, null);
+      });
 
-return (
+      worksheet.addRows(rows);
+
+      // add some top lines (company header)
+      worksheet.insertRow(1, ['']);
+      worksheet.insertRow(1, ['']);
+      worksheet.insertRow(1, ['', '', 'House# D-213, DMCHS, Siraj Ud Daula Road, Karachi']);
+      if (Cookies.get('companyId') === '1') worksheet.insertRow(1, ['', '', 'Seanet Shipping & Logistics']);
+      if (Cookies.get('companyId') === '2') worksheet.insertRow(1, ['', '', 'Air Cargo Services']);
+      worksheet.insertRow(1, ['']);
+      worksheet.insertRow(1, ['']);
+
+      worksheet.getCell('C3').font = { size: 16, bold: true };
+      worksheet.getCell('C4').font = { size: 16, bold: true };
+
+      const imageUrl =
+        Cookies.get('companyId') === '1'
+          ? '/seanet-colored.png'
+          : Cookies.get('companyId') === '2'
+            ? '/acs-colored.png'
+            : '/sns-acs.png';
+
+      const imageBlob = await ImageToBlob(imageUrl);
+      const imageId = workbook.addImage({
+        buffer: await imageBlob.arrayBuffer(),
+        extension: 'png',
+      });
+
+      worksheet.addImage(imageId, {
+        tl: { col: 1, row: 1 },
+        ext: { width: 150, height: 100 },
+      });
+
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'ChartOfAccounts.xlsx';
+      link.click();
+      window.URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error('Export to Excel failed:', e);
+    }
+  };
+
+  /* -------------------- tree helpers -------------------- */
+  // Toggle node.check deep in records and return new cloned records
+  const toggleNodeById = (allRecords, id) => {
+    const clone = JSON.parse(JSON.stringify(allRecords || [])); // deep clone
+    const recurse = (items) => {
+      if (!items) return;
+      for (const item of items) {
+        if (String(item.id) === String(id)) {
+          item.check = !item.check;
+          return true; // stop once toggled
+        }
+        const children = item.children ?? item.Child_Accounts ?? [];
+        if (children && children.length) {
+          if (recurse(children)) return true;
+        }
+      }
+      return false;
+    };
+    recurse(clone);
+    return clone;
+  };
+
+  /* -------------------- recursive node component -------------------- */
+  const AccountNode = ({ node, level = 0 }) => {
+    const children = getChildrenArray(node);
+    const hasChildren = children.length > 0;
+
+    return (
+      <div key={node.id} className='parent' style={{ marginLeft: level * 18 }}>
+        <div
+          className='child icon'
+          onClick={() => {
+            const updated = toggleNodeById(records, node.id);
+            dispatch({ type: 'toggle', fieldName: 'records', payload: updated });
+          }}
+          style={{ cursor: hasChildren ? 'pointer' : 'default' }}
+        >
+          {hasChildren ? (node.check ? <MinusCircleOutlined /> : <PlusCircleOutlined />) : <RightOutlined />}
+        </div>
+
+        <div className='child title'>{(node.code ? node.code + ' ' : '') + node.title}</div>
+
+        {node.editable == 1 && (
+          <div
+            className='child edit-icon'
+            onClick={() => {
+              // isParent: top-level or parent-level (no ChildAccountId means parent/group)
+              const isParentFlag = !node.ChildAccountId; // if node has no ChildAccountId it's a parent/group
+              dispatch({ type: 'toggle', fieldName: 'selectedRecord', payload: node });
+              dispatch({ type: 'toggle', fieldName: 'isParent', payload: isParentFlag });
+              dispatch({ type: 'edit' });
+            }}
+            style={{ cursor: 'pointer' }}
+          >
+            <EditOutlined />
+          </div>
+        )}
+
+        {node.check && hasChildren && children.map((child) => (
+          <AccountNode key={child.id} node={child} level={level + 1} />
+        ))}
+      </div>
+    );
+  };
+
+  /* -------------------- UI -------------------- */
+  return (
     <div className='dashboard-styles'>
-    <div className='base-page-layout'>
-    <div className='account-styles'>
-        <Row>
+      <div className='base-page-layout'>
+        <div className='account-styles'>
+          <Row>
             <Col><h5>Accounts</h5></Col>
-            <Col>   
-                {/* <button className='btn-custom right' onClick={()=>updateCodeParents()}>
-                    Update Codes
-                </button>            */}
-                <button className='btn-custom right' onClick={()=>{ dispatch({ type: 'create'}) }}>
-                    Create
-                </button>
-                <button className="btn-custom-green px-3 py-1 mx-2 float-end" onClick={exportToExcel}>
-                    Export to Excel
-                </button>
+            <Col>
+              {/* <button className='btn-custom right' onClick={()=>updateCodeParents()}>
+                Update Codes
+              </button> */}
+              <button className='btn-custom right' onClick={() => { dispatch({ type: 'create' }) }}>
+                Create
+              </button>
+              <button className="btn-custom-green px-3 py-1 mx-2 float-end" onClick={exportToExcel}>
+                Export to Excel
+              </button>
             </Col>
-        </Row>
-        <hr className='my-2' />
-        <Row style={{maxHeight:'69vh',overflowY:'auto', overflowX:'hidden'}}>
-        {
-        records.map((x, index)=>{
-        return(
-            <div key={x.id} className='parent'>
-            <div className='child icon' onClick={()=>{
-                let tempState = [...records];
-                tempState.forEach((i)=>{
-                    if(i.id==x.id){
-                        i.check=!i.check
-                    }
-                })
-                dispatch({ type: 'toggle', fieldName: 'records', payload: tempState })
-            }}>
-                {x.check?<MinusCircleOutlined />:<PlusCircleOutlined />}
+          </Row>
+          <hr className='my-2' />
+          <Row style={{ maxHeight: '69vh', overflowY: 'auto', overflowX: 'hidden' }}>
+            <div style={{ width: '100%' }}>
+              {records && records.length ? (
+                records.map((group) => (
+                  <AccountNode key={group.id} node={group} level={0} />
+                ))
+              ) : (
+                <div style={{ padding: 20 }}>No accounts found.</div>
+              )}
             </div>
-            <div className='child title'>{x.id +" "+ x.title}</div>
-            {x.check &&
-            <>{x.Parent_Accounts.map((y, indexTwo)=>{
-                return(
-                <div key={y.id} className='mx-4 parent'>
-                <div className='child icon' onClick={()=>{
-                    let tempState = [...records];
-                    tempState[index].Parent_Accounts.forEach((j)=>{
-                        if(j.id==y.id){
-                            j.check=!j.check
-                        }
-                    })
-                    dispatch({ type: 'toggle', fieldName: 'records', payload: tempState })
-                }}>
-                    {y.check?<MinusCircleOutlined />:<PlusCircleOutlined />}
-                </div>
-                    <div className='child title'>{y.code+" "+ y.title}</div>
+          </Row>
 
-                    {y.editable==1&&<div className='child edit-icon' onClick={()=>{
-                        dispatch({ type: 'toggle', fieldName: 'selectedRecord', payload: y })
-                        dispatch({ type: 'toggle', fieldName: 'isParent', payload: true })
-                        dispatch({ type: 'edit'})
-                    }}
-                    ><EditOutlined />
-                    </div>}
-                    {y.check && <>
-                    {
-                    y.Child_Accounts.map((z)=>{
-                        return(
-                        <div key={z.id} className='mx-4 parent'>
-                            <div className='child icon'><RightOutlined /></div>
-                            <div className='child title'>{z.code+" "+ z.title}</div>
-                            {z.editable==1&&<div className='child edit-icon' onClick={()=>{
-                                dispatch({ type: 'toggle', fieldName: 'selectedRecord', payload: z })
-                                dispatch({ type: 'toggle', fieldName: 'isParent', payload: false })
-                                dispatch({ type: 'edit'})
-                                }}><EditOutlined /></div>}
-                        </div>
-                        )
-                    })
-                    }
-                    </>}
-                </div>
-                )
-                })
-            }</>
-            }
-            </div>
-        )
-        })}
-        </Row>
-        <Modal open={visible} 
-            onOk={() => dispatch({ type: 'modalOff' })} 
+          <Modal
+            open={visible}
+            onOk={() => dispatch({ type: 'modalOff' })}
             onCancel={() => dispatch({ type: 'modalOff' })}
-            width={600}
+            width={1000}
             footer={false}
             centered={false}
-        >
+          >
             <CreateOrEdit state={state} dispatch={dispatch} getAccounts={getAccounts} />
-        </Modal>
+          </Modal>
+        </div>
+      </div>
     </div>
-    </div>
-    </div>
-  )
-}
-export default React.memo(ChartOFAccount)
+  );
+};
+
+export default React.memo(ChartOFAccount);

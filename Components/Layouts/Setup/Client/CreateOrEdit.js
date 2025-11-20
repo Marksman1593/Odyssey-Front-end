@@ -308,7 +308,7 @@ const CreateOrEdit = ({state, dispatch, baseValues, clientData, id}) => {
         <Tabs.TabPane tab="Account Info" key="3">
         <Row>
             <Col md={6}>
-             <SelectSearchComp width={"100%"} register={register} name='parentAccount' 
+             <SelectSearchComp clear={true} width={"100%"} register={register} name='parentAccount' 
                 control={control} label='Parent Account:' //disabled={id=="new"?false:true}
                 options={state?.accountList.map((x)=>{
                     return {id:x.id, name:x.title}

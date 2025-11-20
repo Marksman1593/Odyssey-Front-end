@@ -22,11 +22,11 @@ const Upload_CoA = () => {
         {/* <button onClick={()=>{importAECharges()}} style={{width: 'auto'}} className='btn-custom mt-3 px-3 mx-3'>11. Import AE Charges from Climax DB</button> */}
         // await importCommodities()
         // await importVoyages()
-        // await importCOA()
-        // await importCharges()
-        // await importParties()
-        await importJobs()
-        await importVouchers()
+        await importCOA()
+        await importCharges()
+        await importParties()
+        // await importJobs()
+        // await importVouchers()
         // await checkInvoices()
         // await importAirPorts()
         // await importEmployees()
@@ -194,6 +194,7 @@ const Upload_CoA = () => {
     }
     const importCOA = async () => {
         try{
+            console.log("Importing Accounts")
             const companyId = Cookies.get("companyId")
             const coa = await axios.post("http://localhost:8081/accounts/getAll")
             console.log("COA Data:", coa.data)
@@ -222,6 +223,7 @@ const Upload_CoA = () => {
 
 const importParties = async () => {
     try{
+        console.log("Importing Parties")
         const { data } = await axios.get("http://localhost:8081/parties/get")
         console.log("Parties Data:", data)
 

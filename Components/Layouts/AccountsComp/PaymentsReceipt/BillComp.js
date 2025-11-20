@@ -73,7 +73,8 @@ const BillComp = ({back, companyId, state, dispatch}) => {
 
   const fetchInvoices = async () => {
     try{
-      // console.log("INVOICES FETCHED!!!!!")
+      console.log("Fetching Invoices")
+      console.log(state.selectedAccount, state.currency, state.payType, state.type, companyId)
       await axios.get(process.env.NEXT_PUBLIC_CLIMAX_GET_INVOICE_BY_PARTY_ID, {
         headers: {
           id: state.selectedAccount,
@@ -117,19 +118,10 @@ const BillComp = ({back, companyId, state, dispatch}) => {
     }
   }, [state.selectedAccount, state.payType, state.currency])
 
-  // useEffect(()=>{
-  //   if(state.selectedAccount && !state.edit && state.invoices.length>0 && state.currency != state.invocies[0].currency){
-  //     fetchInvoices()
-  //   }
-  // },[state.currency])
-
   useEffect(() => {
-    // console.log(state.receivingAccounts)
     const fetchreceivingAccount = async () => {
       dispatch(setField({ field: 'load', value: true }))
       try{
-        // console.log(state)
-        // console.log(companyId)
         await axios.get(process.env.NEXT_PUBLIC_CLIMAX_GET_ACCOUNT_FOR_TRANSACTION, {
           headers: {
             type: state.transactionMode,
@@ -231,7 +223,7 @@ const BillComp = ({back, companyId, state, dispatch}) => {
           gainLoss: state.gainLossAmount,
           totalReceiving: state.totalReceivable,
           partyId: state.selectedAccount,
-          partyName: state.type=="client"?state.accounts.find((x) => x.Client_Associations[0].ChildAccountId === state.selectedAccount)?.name || "N/A":state.accounts.find((x) => x.Vendor_Associations[0].ChildAccountId === state.selectedAccount)?.name || "N/A",
+          partyName: state.accounts.find((x) => x.id === state.selectedAccount)?.name || "N/A",
           partyType: state.type,
           type: state.onAccount,
           transactionMode: state.transactionMode,
@@ -301,7 +293,7 @@ const BillComp = ({back, companyId, state, dispatch}) => {
         temp.push({
           partyId: state.selectedAccount,
           accountType: "partyAccount",
-          accountName: state.type=="client"?state.accounts.find((x) => x.Client_Associations[0].ChildAccountId === state.selectedAccount)?.name || "N/A":state.accounts.find((x) => x.Vendor_Associations[0].ChildAccountId === state.selectedAccount)?.name || "N/A",
+          accountName: state.accounts.find((x) => x.id === state.selectedAccount)?.name || "N/A",
           debit: state.totalReceivable<0?state.totalReceivable*-1:0,
           credit: state.totalReceivable>0?state.totalReceivable:0,
           type: state.totalReceivable<0?'debit':'credit'
@@ -333,7 +325,7 @@ const BillComp = ({back, companyId, state, dispatch}) => {
         temp.push({
           partyId: state.selectedAccount,
           accountType: "Gain/Loss Account",
-          accountName: state.type=="client"?state.accounts.find((x) => x.Client_Associations[0].ChildAccountId === state.selectedAccount)?.name || "N/A":state.accounts.find((x) => x.Vendor_Associations[0].ChildAccountId === state.selectedAccount)?.name || "N/A",
+          accountName: state.accounts.find((x) => x.id === state.selectedAccount)?.name || "N/A",
           debit: state.gainLossAmount>0?state.gainLossAmount/state.exRate:0,
           credit: state.gainLossAmount<0?(state.gainLossAmount*-1)/state.exRate:0,
           type: state.gainLossAmount>0?'debit':'credit'
@@ -364,7 +356,7 @@ const BillComp = ({back, companyId, state, dispatch}) => {
         temp.push({
           partyId: state.selectedAccount,
           accountType: "partyAccount",
-          accountName: state.type=="client"?state.accounts.find((x) => x.Client_Associations[0].ChildAccountId === state.selectedAccount)?.name || "N/A":state.accounts.find((x) => x.Vendor_Associations[0].ChildAccountId === state.selectedAccount)?.name || "N/A",
+          accountName: state.accounts.find((x) => x.id === state.selectedAccount)?.name || "N/A",
           debit: state.payType!="Recievable"?state.totalReceivable:0,
           credit: state.payType=="Recievable"?state.totalReceivable:0,
           type: state.payType!="Recievable"?'debit':'credit'
@@ -837,8 +829,8 @@ const BillComp = ({back, companyId, state, dispatch}) => {
           </thead>
           <tbody>
             {/* {console.log(state.transactions)} */}
-            {state.transactions.map((x)=>(
-              <tr key={x.partyId} style={{borderBottom: '1px solid #d7d7d7', padding: '10px 0px'}}>
+            {state.transactions.map((x, i)=>(
+              <tr key={i} style={{borderBottom: '1px solid #d7d7d7', padding: '10px 0px'}}>
                 <td style={{width: '2%', paddingLeft: '5px', borderLeft: '1px solid #d7d7d7', padding: '10px 10px'}}>{x.accountType}</td>
                 <td style={{width: '2%', paddingLeft: '5px', borderLeft: '1px solid #d7d7d7', padding: '10px 10px'}}>{x.accountName}</td>
                 <td style={{width: '2%', paddingLeft: '5px', borderLeft: '1px solid #d7d7d7', padding: '10px 10px'}}>{commas(x.debit)}</td>

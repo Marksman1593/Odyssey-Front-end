@@ -214,11 +214,13 @@ const ChargesList = ({state, dispatch, type, append, reset, fields, chargeList, 
         }
       }}>Auto Invoice</div>
       <div className='div-btn-custom-green fl-right py-1 px-3 mx-1' style={{cursor: !generate? "not-allowed" : "pointer"}} onClick={async ()=>{
+        console.log("Charge List:", chargeList)
         console.log(state.chargeLoad)
         if(generate && !InvoiceBuffer){
           setInvoiceBuffer(true)
           await delay(500)
           let temp = chargeList.filter((x)=>(x.partyType=="vendor"||x.partyType=="vendors")&&x.check)
+          console.log("filtered Charges", temp)
           if(temp.length==0){
             openNotification('Error', `No Vendor Selected!`, 'red');
           }else{
@@ -382,7 +384,7 @@ const ChargesList = ({state, dispatch, type, append, reset, fields, chargeList, 
                           searchPartyId = state.selectedRecord.localVendorId;
                         break;
                     }
-                    let partyData = partyType == "Client" ? await getClients(searchPartyId) : await getVendors(searchPartyId);
+                    let partyData = await getClients(searchPartyId);
                     if (state.chargesTab == '1') {
                       tempChargeList[index].invoiceType = partyData[0].types.includes("Overseas Agent") ? "Agent Invoice" : "Job Invoice";
                     } else {

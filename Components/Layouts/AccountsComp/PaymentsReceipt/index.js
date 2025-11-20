@@ -33,87 +33,6 @@ const PaymentsReceipt = ({ id, voucherData, q }) => {
 
   const [loading, setLoading] = useState(false);
 
-  // const fetchOldVouchers = async (page = 1) => {
-  //   if (loading) return; // Prevent multiple calls
-  //   setLoading(true);
-
-  //   try {
-  //     const response = await axios.get(process.env.NEXT_PUBLIC_CLIMAX_GET_OLD_PAY_REC_VOUCHERS, {
-  //       headers: { companyid: Cookies.get('companyId'), page: page, limit: 50 }
-  //     });
-
-  //     const result = response.data.result;
-  //     // console.log("Old Vouchers", result)
-  //     if (result.length === 0) {
-  //       console.log("No more vouchers to fetch.");
-  //       setLoading(false);
-  //       return;
-  //     }
-
-  //     const temp = [];
-  //     result.forEach((x) => {
-  //       // console.log("Old Vouchers::", x.voucher_Id)
-  //       x.invoice.forEach((y) => {
-  //         if (y.payType === "Payble") {
-  //           // y.receiving = x.Invoice_Transactions[0].amount;
-  //           y.receiving = 0
-  //           x.Invoice_Transactions.forEach((z) => {
-  //             if(z.InvoiceId == y.id){
-  //               y.receiving += parseFloat(z.amount)
-  //             }
-  //           })
-  //         } else {
-  //           // y.receiving = x.Invoice_Transactions[0].amount;
-  //           y.receiving = 0
-  //           x.Invoice_Transactions.forEach((z, i) => {
-  //             if(z.InvoiceId == y.id){
-  //               // console.log(z)
-  //               y.receiving += parseFloat(z.amount)
-  //             }
-  //           })
-  //         }
-  //         y.constReceiving = y.receiving
-  //         // console.log("Const Receiving:", y.constReceiving)
-  //         // console.log("RECEIVING: ", y.receiving, y.payType, y.invoice_No, x.voucher_Id)
-  //       });
-  //     });
-
-  //     if (result.length > 0) {
-  //       temp.push(
-  //         result.map((x) => {
-  //           return {
-  //             id: x.id,
-  //             voucherNo: x.voucher_Id,
-  //             name: x.partyName,
-  //             party: x.partyType,
-  //             type: x.vType,
-  //             data: x.createdAt,
-  //             currency: x.currency,
-  //             amount: x.Voucher_Heads.find((y) => y.accountType === 'partyAccount' || y.accountType === 'General' || y.accountType === 'Admin Expense')
-  //               ? x.Voucher_Heads.find((y) => y.accountType === 'partyAccount' || y.accountType === 'General' || y.accountType === 'Admin Expense').amount
-  //               : 0.0,
-  //             partyId: x.partyId,
-  //             x: x
-  //           };
-  //         })
-  //       );
-  //     }
-
-  //     if (temp.length > 0) {
-  //       // console.log("Old Vouchers", temp[0])
-  //       dispatch(setField({ field: 'oldVouchers', value: temp[0] }));
-  //     }
-
-  //     if (result.length === 50) {
-  //       await fetchOldVouchers(page + 1);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching old vouchers:", error);
-  //   } finally {
-  //     setLoading(false); // Reset loading state
-  //   }
-  // };
-
   const fetchOldVouchers = async (pageNum = 1) => {
     if (loading) return;
     setLoading(true);
@@ -182,6 +101,7 @@ const PaymentsReceipt = ({ id, voucherData, q }) => {
   })
 
   const fetchAccounts = async () => {
+    console.log("Fetching Accounts for type:", state.type)
     const accounts = await axios.get(`${process.env.NEXT_PUBLIC_CLIMAX_MAIN_URL}/misc/parties/getPartiesbyType`,
       { headers:{companyid: Cookies.get('companyId'), type: state.type} }
     ).then((x) => {
@@ -242,7 +162,6 @@ const PaymentsReceipt = ({ id, voucherData, q }) => {
           })
           item.constReceiving = item.receiving
           console.log("ITEM: ", item)
-          // item.receiving = item.Invoice_Transactions[0]?.VoucherId.toString()==state.voucherId?item.Invoice_Transactions[0]?.amount:0;
           map.set(item.id, item);
         });
 
@@ -420,39 +339,6 @@ const PaymentsReceipt = ({ id, voucherData, q }) => {
             {(!(state.selectedAccount==""||state.selectedAccount==undefined)&&state.edit)&&<Col md={2}>
               <button onClick={() =>{
                 refresh()
-                // try{
-                //   await axios.get(process.env.NEXT_PUBLIC_CLIMAX_GET_INVOICE_BY_PARTY_ID, {
-                //     headers: {
-                //       id: state.selectedAccount,
-                //       companyid: Cookies.get('companyId'),
-                //       invoicecurrency: state.currency,
-                //       pay: state.payType,
-                //       type: state.type,
-                //       edit: true,
-                //     }
-                //   }).then((x) => {
-                //     let temp = []
-                //     state.edit?temp  = x.data.result.filter(y => parseFloat(y.total)-parseFloat(y.recieved) != 0.0 && parseFloat(y.total)-parseFloat(y.paid) != 0.0):
-                //     temp = x.data.result;
-                //     let temp2 = [...state.invoices];
-                //     const map = new Map();
-                //     temp2.forEach(item => map.set(item.id, item));
-                //     temp.forEach(item => {
-                //       console.log("Item:", item)
-                //       console.log("State:", state)
-                //       item.receiving = item.Invoice_Transactions[0]?.VoucherId.toString()==state.voucherId?item.Invoice_Transactions[0]?.amount:0;
-                //       map.set(item.id, item);
-                //     });
-
-                //     // Get the union as an array
-                //     const union = Array.from(map.values());
-                //     console.log(union)
-                //     dispatch(setField({ field: 'editing', value: true }))
-                //     dispatch(setField({ field: 'invoices', value: union }))
-                //   })
-                // }catch(e){
-                //   console.log(e)
-                // }
               }} style={{ fontSize: 14, width: "100%", display: "flex", justifyContent: "center", alignItems: "center", height: "100%", backgroundColor: "#438995", color: "white", borderRadius: 20 }}><span style={{marginRight: 5}}>Refresh</span> <SyncOutlined style={{ fontSize: 16 }}/></button>
             </Col>}
             {!(state.selectedAccount==""||state.selectedAccount==undefined)&&<Col md={2}>
