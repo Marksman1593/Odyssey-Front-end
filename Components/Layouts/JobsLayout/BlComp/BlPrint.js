@@ -40,8 +40,8 @@ const BlPrint = ({allValues, state, borders, heading, border, inputRef, stamps, 
                 <div style={{ borderBottom: border, height: 95, position:"relative" }}>
                   <div className={`fw-5 ${heading}`} style={{ lineHeight:1.2 }}>Consignee Or Order</div>
                   <div className="bl-print" style={{marginTop:2}}>{parse(cleanNullParagraphs(state.consigneeContent))}</div>
-                  <div className="bl-print" style={{position:"absolute", top:"60px", width: "250px"  }}> <b>  {!formE && allValues.formE ? `FORM E NUMBER : ${allValues.formE}`:null}</b> </div>
-                  <div className="bl-print" style={{position:"absolute", top:"60px", left:"250px"  }}>
+                  <div className="bl-print" style={{position:"absolute", top:"70px", width: "250px"  }}> <b>  {!formE && allValues.formE ? `FORM E NUMBER : ${allValues.formE}`:null}</b> </div>
+                  <div className="bl-print" style={{position:"absolute", top:"70px", left:"250px"  }}>
                     <b> {!formE && allValues.formEDate._i ? `DATE : ${allValues.formEDate._i?.slice(0, 10)}`:null}</b> 
                   </div>
                 </div>
@@ -94,13 +94,14 @@ const BlPrint = ({allValues, state, borders, heading, border, inputRef, stamps, 
               <Col style={{ borderRight: border }} className="px-0">
                 <div  className="px-1">
                   <div className={` ${heading}`}>Initial Place Of Reciept</div>
-                  <div className="fw-7" style={{marginTop:10}}>{ports.ports.filter((x)=>x.id==allValues.por)[0]?.name || allValues.por}</div>
+                  <div className="fw-7" style={{marginTop: 5, marginBottom: 5, marginLeft: 15}}>{ports.ports.filter((x)=>x.id==allValues.por)[0]?.name + ", " + ports.ports.filter((x)=>x.id==allValues.por)[0]?.country || allValues.por}</div>
                 </div>
               </Col>
               <Col className="px-0">
                 <div  className="px-1">
                   <div className={` ${heading}`}>Port Of Discharge</div>
-                  <div className="fw-7" style={{marginTop:10}}>{ports.ports.filter((x)=>x.id==allValues.podTwo)[0]?.name || allValues.podTwo}</div>
+                  {/* <div className="fw-7" style={{marginTop:10}}>{ports.ports.filter((x)=>x.id==allValues.podTwo)[0]?.name || allValues.podTwo}</div> */}
+                  <div className="fw-7" style={{marginTop: 5, marginBottom: 5, marginLeft: 15}}>{ports.ports.filter((x)=>x.id==allValues.podTwo)[0]?.name + ", " + ports.ports.filter((x)=>x.id==allValues.podTwo)[0]?.country || allValues.podTwo}</div>
                 </div>
               </Col>
             </Row>
@@ -119,13 +120,15 @@ const BlPrint = ({allValues, state, borders, heading, border, inputRef, stamps, 
               <Col style={{ borderRight: border }} className="px-0">
                 <div  className="px-1">
                   <div className={` ${heading}`}>Port Of Loading</div>
-                  <div className="fw-7" style={{marginTop:10}}>{ports.ports.filter((x)=>x.id==allValues.polTwo)[0]?.name || allValues.polTwo}</div>
+                  {/* <div className="fw-7" style={{marginTop:10}}>{ports.ports.filter((x)=>x.id==allValues.polTwo)[0]?.name || allValues.polTwo}</div> */}
+                  <div className="fw-7" style={{marginTop: 5, marginBottom: 5, marginLeft: 15}}>{ports.ports.filter((x)=>x.id==allValues.polTwo)[0]?.name + ", " + ports.ports.filter((x)=>x.id==allValues.polTwo)[0]?.country || allValues.polTwo}</div>
                 </div>
               </Col>
               <Col className="px-0">
                 <div style={{ height: 35 }} className="px-1">
                   <div className={` ${heading}`}>Place Of Delivery</div>
-                  <div className="fw-7" style={{marginTop:10}}>{ports.ports.filter((x)=>x.id==allValues.poDeliveryTwo)[0]?.name || allValues.poDeliveryTwo}</div>
+                  {/* <div className="fw-7" style={{marginTop:10}}>{ports.ports.filter((x)=>x.id==allValues.poDeliveryTwo)[0]?.name || allValues.poDeliveryTwo}</div> */}
+                  <div className="fw-7" style={{marginTop: 5, marginBottom: 5, marginLeft: 15}}>{ports.ports.filter((x)=>x.id==allValues.poDeliveryTwo)[0]?.name + ", " + ports.ports.filter((x)=>x.id==allValues.poDeliveryTwo)[0]?.country || allValues.poDeliveryTwo}</div>
                 </div>
               </Col>
             </Row>
@@ -180,20 +183,31 @@ const BlPrint = ({allValues, state, borders, heading, border, inputRef, stamps, 
                   <span style={{ marginTop: "15px" }}>Net Weight:</span><br /> 
                   <span>{!netWeight &&  `${parseFloat(allValues.net).toFixed(3)} KGS`}</span> 
                   <div style={{ display: "flex", flexDirection: "column", marginTop: "15px"}}>
-                    <span>
+                    {console.log("Stamps:", allValues.stamps)}
+                    <span style={{position: 'absolute'}}>
+                      {allValues.stamps
+                        ?.filter(x => x.stamp_group === "1" || x.stamp_group === "2")
+                        .map((x, i) => (
+                          <span key={i} style={{ marginRight: "60px" }}>
+                            {stamps[Number(x.code) - 1]?.label}
+                          </span>
+                        ))
+                      }
+                    </span>
+                    {/* <span>
                       {allValues.stamps?.length > 0 &&
                         allValues.stamps
-                          .filter(x => x.stamp_group == "2")
+                          .filter(x => x.stamp_group == "2" || x.stamp_group == "1")
                           .map(x => stamps[Number(x.code) - 1]?.label)
                           .join(" ")}
-                    </span>
-                    <span style={{ marginLeft: "35px" }}>
+                    </span> */}
+                    {/* <span>
                     {allValues.stamps?.length > 0 &&
                       allValues.stamps
                         .filter(x => x?.stamp_group == "1")
                         .map(x => stamps[Number(x.code) - 1]?.label)
                         .join(" ")}
-                  </span>
+                  </span> */}
                   </div>
                   </div>
                 </Col>
@@ -204,7 +218,7 @@ const BlPrint = ({allValues, state, borders, heading, border, inputRef, stamps, 
                 </div>
                 </Col>
               </Col>
-              <Col style={{ display: "flex", justifyContent: "space-between", marginTop: "0px"}}>
+              <Col style={{ display: "flex", justifyContent: "space-between", marginTop: "10px"}}>
                 <Col md={3} className="bl-print" style={{marginTop: "50px"}} >
                   <p className="bl-print" style={{  borderBottom: border }}>CONTAINER NO .SIZE SEAL</p>
                   { !containerData &&
@@ -294,7 +308,7 @@ const BlPrint = ({allValues, state, borders, heading, border, inputRef, stamps, 
               <Col style={{ margin:0, borderRight:border, paddingBottom:3, height:52 }} className={` ${heading} fs-12`}>
                 <div>Freight Payable at</div>
                 <div style={{ color: "black" }} className="fw-7">
-                  {allValues.freightPaybleAt}
+                  {allValues.freightPaybleAt=="DJDST"?"Destination":allValues.freightPaybleAt}
                 </div>
               </Col>
               <Col style={{ margin:0, paddingBottom:3 }} className={`${heading} fs-11`}>
