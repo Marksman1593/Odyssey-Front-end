@@ -59,6 +59,7 @@ const baseValues = {
   commodityId:'',
   overseasAgentId:'',
   salesRepresentatorId:'',
+  por: '',
   pol:'PKKHI',
   pod:'',
   fd:'',

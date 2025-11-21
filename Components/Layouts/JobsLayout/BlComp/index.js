@@ -27,13 +27,14 @@ const BlComp = ({id, blData, partiesData, type}) => {
   const set = (a, b) => dispatch({ type: "toggle", fieldName: a, payload: b });
   const [deleteArr, setDeleteArr] = useState([]);
   const dispatchNew = useDispatch();
-  const { refetch } = useQuery({
+  const { data, isSuccess, refetch } = useQuery({
     queryKey:["jobData", {id:id=="new"?currentJobValue:blData.SEJobId, type:type}], 
     queryFn: () => getJobById({
       id:id=="new"?currentJobValue:blData.SEJobId, 
       type:type
     }),
   })
+  console.log("job data: ", data)
   const { register, control, handleSubmit, reset, formState: { errors }, } = useForm({
     defaultValues: state.values,
   });
@@ -220,7 +221,7 @@ const BlComp = ({id, blData, partiesData, type}) => {
             </Tabs.TabPane>
             <Tabs.TabPane tab="Ref No's / Stamps" key="4">
               {allValues.jobNo && <Stamps state={state} id={id} control={control} register={register} useWatch={useWatch} handleSubmit={handleSubmit} 
-                fields={fields} append={append} remove={remove} onDelete={onDelete} errors={errors} 
+                fields={fields} append={append} remove={remove} onDelete={onDelete} errors={errors} data={data}
               />}
             </Tabs.TabPane>
           </Tabs>

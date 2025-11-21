@@ -12,6 +12,16 @@ const Routing = ({register, control, errors, state, useWatch, type}) => {
 
   return (
     <>
+    {type == "SE" && <Row>
+        <Col md={6}>
+            <SelectSearchComp register={register} name='por' control={control} 
+                label={'Initial Place Of Receipt'} 
+                width={"100%"}
+                options={ports.ports} />
+            <Space/>
+        </Col>
+    </Row>
+    }
     <Row>
         <Col md={6}>
             <SelectSearchComp register={register} name='pol' control={control} 

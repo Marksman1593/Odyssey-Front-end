@@ -7,6 +7,7 @@ import InputComp from '/Components/Shared/Form/InputComp';
 import InputNumComp from '/Components/Shared/Form/InputNumComp';
 import DateComp from '/Components/Shared/Form/DateComp';
 import TextAreaComp from '/Components/Shared/Form/TextAreaComp';
+import { cleanNullParagraphs } from './states';
 
 const BlDetail = ({control, register, state, useWatch, dispatch, reset, type}) => {
 
@@ -34,7 +35,7 @@ const BlDetail = ({control, register, state, useWatch, dispatch, reset, type}) =
       }),
     ],
     autofocus: true,
-    content: state[variable],
+    content: cleanNullParagraphs(state[variable]),
     onUpdate({ editor }) {
       set(variable, editor.getHTML())
     },

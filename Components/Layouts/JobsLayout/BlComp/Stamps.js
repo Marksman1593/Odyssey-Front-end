@@ -7,8 +7,7 @@ import { CloseCircleOutlined } from "@ant-design/icons";
  import SelectSearchComp from "../../../Shared/Form/SelectSearchComp";
 import BlPrint from "./BlPrint";
 
-const Stamps = ({ state, control, register, useWatch, handleSubmit, fields, append, remove, onDelete, errors }) => {
-
+const Stamps = ({ state, control, register, useWatch, handleSubmit, fields, append, remove, onDelete, errors, data }) => {
   let inputRef = useRef(null);
   const [borders, setBorders] = useState(true);
   const allValues = useWatch({ control });
@@ -118,7 +117,7 @@ const Stamps = ({ state, control, register, useWatch, handleSubmit, fields, appe
         </div>
       </div>
     </div>
-    <BlPrint state={state} allValues={allValues} border={border} line={line} borders={borders} heading={heading} inputRef={inputRef} stamps={stamps} cbm={cbm} grossWeight={grossWeight} netWeight={netWeight}  containerData={containerData} formE={formE}/>
+    <BlPrint state={state} allValues={{...allValues, jobData: data.result}} border={border} line={line} borders={borders} heading={heading} inputRef={inputRef} stamps={stamps} cbm={cbm} grossWeight={grossWeight} netWeight={netWeight}  containerData={containerData} formE={formE}/>
   </div>
 )};
 

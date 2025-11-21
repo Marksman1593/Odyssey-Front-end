@@ -2,10 +2,12 @@ import React, { useEffect } from 'react'
 import { Col, Row } from "react-bootstrap";
 import parse from "html-react-parser";
 import ReactToPrint  from "react-to-print";
+import { cleanNullParagraphs } from './states';
+import ports from '../../../../jsonData/ports'
+import moment from 'moment';
 
 const BlPrint = ({allValues, state, borders, heading, border, inputRef, stamps, line, grossWeight, netWeight,  containerData, formE, cbm}) => {
-  const gross_weight = allValues?.Container_Infos?.[0]?.gross
-  // console.log("grossWeight",gross_weight , netWeight)
+  const gross_weight = allValues?.Container_Infos?.[0]?.gross || 0
 
   return (
     <div style={{ width: "10%" }}>
@@ -33,11 +35,11 @@ const BlPrint = ({allValues, state, borders, heading, border, inputRef, stamps, 
                   <div className={`fw-5 ${heading}`} style={{ lineHeight:1.3 }}>
                     Shipper
                   </div>
-                  <div className="bl-print mt-1">{parse(state.shipperContent)}</div>
+                  <div className="bl-print mt-1">{parse(cleanNullParagraphs(state.shipperContent))}</div>
                 </div>
                 <div style={{ borderBottom: border, height: 95, position:"relative" }}>
                   <div className={`fw-5 ${heading}`} style={{ lineHeight:1.2 }}>Consignee Or Order</div>
-                  <div className="bl-print" style={{marginTop:2}}>{parse(state.consigneeContent)}</div>
+                  <div className="bl-print" style={{marginTop:2}}>{parse(cleanNullParagraphs(state.consigneeContent))}</div>
                   <div className="bl-print" style={{position:"absolute", top:"60px", width: "250px"  }}> <b>  {!formE && allValues.formE ? `FORM E NUMBER : ${allValues.formE}`:null}</b> </div>
                   <div className="bl-print" style={{position:"absolute", top:"60px", left:"250px"  }}>
                     <b> {!formE && allValues.formEDate._i ? `DATE : ${allValues.formEDate._i?.slice(0, 10)}`:null}</b> 
@@ -45,7 +47,7 @@ const BlPrint = ({allValues, state, borders, heading, border, inputRef, stamps, 
                 </div>
                 <div className="pb-2" style={{ height: 95 }}>
                   <div className={`fw-5  ${heading}`} style={{ lineHeight:1.2}}>Notify Party / Address</div>
-                  <div className="bl-print" style={{marginTop:5}}>{parse(state.notifyOneContent)}</div>
+                  <div className="bl-print" style={{marginTop:5}}>{parse(cleanNullParagraphs(state.notifyOneContent))}</div>
                 </div>
               </Col>
               {/*1st row right side block  */}
@@ -92,12 +94,13 @@ const BlPrint = ({allValues, state, borders, heading, border, inputRef, stamps, 
               <Col style={{ borderRight: border }} className="px-0">
                 <div  className="px-1">
                   <div className={` ${heading}`}>Initial Place Of Reciept</div>
+                  <div className="fw-7" style={{marginTop:10}}>{ports.ports.filter((x)=>x.id==allValues.por)[0]?.name || allValues.por}</div>
                 </div>
               </Col>
               <Col className="px-0">
                 <div  className="px-1">
                   <div className={` ${heading}`}>Port Of Discharge</div>
-                  <div className="fw-7" style={{marginTop:10}}>{allValues.podTwo}</div>
+                  <div className="fw-7" style={{marginTop:10}}>{ports.ports.filter((x)=>x.id==allValues.podTwo)[0]?.name || allValues.podTwo}</div>
                 </div>
               </Col>
             </Row>
@@ -116,13 +119,13 @@ const BlPrint = ({allValues, state, borders, heading, border, inputRef, stamps, 
               <Col style={{ borderRight: border }} className="px-0">
                 <div  className="px-1">
                   <div className={` ${heading}`}>Port Of Loading</div>
-                  <div className="fw-7" style={{marginTop:10}}>{allValues.polTwo}</div>
+                  <div className="fw-7" style={{marginTop:10}}>{ports.ports.filter((x)=>x.id==allValues.polTwo)[0]?.name || allValues.polTwo}</div>
                 </div>
               </Col>
               <Col className="px-0">
                 <div style={{ height: 35 }} className="px-1">
                   <div className={` ${heading}`}>Place Of Delivery</div>
-                  <div className="fw-7" style={{marginTop:10}}>{allValues.poDeliveryTwo}</div>
+                  <div className="fw-7" style={{marginTop:10}}>{ports.ports.filter((x)=>x.id==allValues.poDeliveryTwo)[0]?.name || allValues.poDeliveryTwo}</div>
                 </div>
               </Col>
             </Row>
@@ -161,12 +164,12 @@ const BlPrint = ({allValues, state, borders, heading, border, inputRef, stamps, 
             <Col>
               <Col style={{ display: "flex", color:"black", fontWeight:"600", marginTop:10 }}>
                 <Col md={2}>
-                  <div className="bl-print" >{parse(state.marksContent)}</div>
+                  <div className="bl-print" >{parse(cleanNullParagraphs(state.marksContent))}</div>
                   </Col>
                 <Col md={2}>{parse(state.noOfPckgs)}</Col>
                 <Col md={4}>
                     <div className="bl-print" >
-                      {allValues.stamps?.length>0 && allValues.stamps.map((x)=> x?.stamp_group == "4"?stamps[Number(x.code)-1].label:"")}{parse(state.descOfGoodsContent)}
+                      {allValues.stamps?.length>0 && allValues.stamps.map((x)=> x?.stamp_group == "4"?stamps[Number(x.code)-1].label:"")}{parse(cleanNullParagraphs(state.descOfGoodsContent))}
                     </div>
                 </Col>
                 <Col md={1}></Col>
@@ -177,8 +180,20 @@ const BlPrint = ({allValues, state, borders, heading, border, inputRef, stamps, 
                   <span style={{ marginTop: "15px" }}>Net Weight:</span><br /> 
                   <span>{!netWeight &&  `${parseFloat(allValues.net).toFixed(3)} KGS`}</span> 
                   <div style={{ display: "flex", flexDirection: "column", marginTop: "15px"}}>
-                    <span>{allValues.stamps?.length > 0 && allValues.stamps.map((x) => x.stamp_group == '2' ? stamps[Number(x.code) - 1].label : "" )}</span>
-                    <span style={{marginLeft: "35px"}}> {allValues.stamps?.length > 0 && allValues.stamps?.map((x) => x?.stamp_group=="1"? stamps[Number(x.code) - 1]?.label: "")}</span>
+                    <span>
+                      {allValues.stamps?.length > 0 &&
+                        allValues.stamps
+                          .filter(x => x.stamp_group == "2")
+                          .map(x => stamps[Number(x.code) - 1]?.label)
+                          .join(" ")}
+                    </span>
+                    <span style={{ marginLeft: "35px" }}>
+                    {allValues.stamps?.length > 0 &&
+                      allValues.stamps
+                        .filter(x => x?.stamp_group == "1")
+                        .map(x => stamps[Number(x.code) - 1]?.label)
+                        .join(" ")}
+                  </span>
                   </div>
                   </div>
                 </Col>
@@ -213,14 +228,13 @@ const BlPrint = ({allValues, state, borders, heading, border, inputRef, stamps, 
                     discharge Destination as per Line’s Tariff & At the
                     Account of Consignee
                   </p>
-                <div style={{ color: "black", fontWeight:"600", fontSize:"12px"}}>
-
-                  {allValues.stamps?.length > 0 && allValues.stamps?.map((x) =>
-                    x?.stamp_group == "3"
-                    ? stamps[Number(x.code) - 1].label
-                    : ""
-                    )}
-                    </div>
+                <div style={{ color: "black", fontWeight: "600", fontSize: "12px" }}>
+                  {allValues.stamps?.length > 0 &&
+                    allValues.stamps
+                      .filter(x => x?.stamp_group == "3")
+                      .map(x => stamps[Number(x.code) - 1]?.label)
+                      .join(" ")}
+                </div>
                 </Col>
               </Col>
             </Col>
@@ -273,19 +287,19 @@ const BlPrint = ({allValues, state, borders, heading, border, inputRef, stamps, 
         <Row style={{ paddingLeft: 37, paddingRight: 37, fontFamily:"serif"}}>
           <Col style={{ margin: 0, borderBottom: border, borderLeft: border, borderRight: border, maxWidth: "46%"}}>
             <div className={`${heading} fs-12`}>For Delivery Please Apply to: </div>
-            <div style={{fontSize:10, lineHeight:1}}><b>{parse(state.deliveryContent)}</b></div>
+            <div style={{fontSize:10, lineHeight:1}}><b>{parse(cleanNullParagraphs(state.deliveryContent))}</b></div>
           </Col>
           <Col style={{ margin:0, borderRight: border, borderBottom: border, borderLeft: "none", maxWidth: "54%", paddingLeft: 1, paddingRight: 1, paddingTop: 0, paddingBottom: 5}}>
             <Row style={{ position:"relative", left:10 }}>
               <Col style={{ margin:0, borderRight:border, paddingBottom:3, height:52 }} className={` ${heading} fs-12`}>
-                <div>Freight Payble at</div>
+                <div>Freight Payable at</div>
                 <div style={{ color: "black" }} className="fw-7">
                   {allValues.freightPaybleAt}
                 </div>
               </Col>
               <Col style={{ margin:0, paddingBottom:3 }} className={`${heading} fs-11`}>
                 Date & Place of issue
-                <p  style={{color:'black'}}>{allValues?.issueDate?._i?.slice(0, 10)} <b> {allValues?.issuePlace}</b></p>
+                <p  style={{color:'black', margin: '0px'}}><b> {moment(allValues?.issueDate).format('DD/MMM/YYYY') + " | " + allValues.issuePlace}</b></p>
               </Col>
             </Row>
             <div style={{ height: 1, width: "100%", backgroundColor: line }}></div>
@@ -296,10 +310,12 @@ const BlPrint = ({allValues, state, borders, heading, border, inputRef, stamps, 
                 </div>
               </Col>
               <Col style={{ margin: 0, paddingBottom: 3 }} className={`${heading} fs-12`}>
-                <div style={{ lineHeight: 1 }} className="mt-1">As Agent or on behalf or Carrier<br />
-                  {allValues.stamps?.length > 0 && allValues.stamps.map((x) =>
-                    x.stamp_group == "5" && stamps[Number(x.code) - 1].label 
-                  )}
+                <div style={{ lineHeight: 1 }} className="mt-1">
+                  As Agent or on behalf or Carrier<br />
+                  {allValues.stamps
+                    ?.filter(x => x.stamp_group === "5")
+                    .map(x => stamps[Number(x.code) - 1]?.label)
+                  }
                 </div>
               </Col>
             </Row>
@@ -317,13 +333,13 @@ const BlPrint = ({allValues, state, borders, heading, border, inputRef, stamps, 
           {state.marksContentTwo?.length>35 &&
           <Col md={4} className="fs-11">
               <p className="bl-print mb-2" style={{  borderBottom: border }}>MARKS & CONTAINER NO {"(Continued)"}</p>
-              <div className="bl-print" style={{color:'black'}}>{parse(state.marksContentTwo)}</div>
+              <div className="bl-print" style={{color:'black'}}>{parse(cleanNullParagraphs(state.marksContentTwo))}</div>
           </Col>
           }
           {state.descOfGoodsContentTwo?.length>35 &&
           <Col md={4} className="fs-11">
               <p className="bl-print mb-2" style={{  borderBottom: border }}>DESCRIPTION {"(Continued)"}</p>
-              <div className="bl-print" style={{color:'black'}}>{parse(state.descOfGoodsContentTwo)}</div>
+              <div className="bl-print" style={{color:'black'}}>{parse(cleanNullParagraphs(state.descOfGoodsContentTwo))}</div>
           </Col>
           }
         </Row>

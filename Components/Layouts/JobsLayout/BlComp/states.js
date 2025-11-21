@@ -317,6 +317,7 @@ const setAndFetchBlData = async(reset, state, allValues, set, dispatch, blData) 
   set("load", true);
   result.equip = [{}];
   const fetchedResult = await axios.post(process.env.NEXT_PUBLIC_CLIMAX_POST_FIND_JOB_BY_NO,{ no:result.SE_Job.jobNo }).then((x)=>x.data.result)
+  console.log("fetchedResult", fetchedResult);
   allValues.SEJobId =         fetchedResult[0].id;
   allValues.jobNo =           fetchedResult[0].jobNo;
   allValues.consignee =       fetchedResult[0].consignee?.name;
@@ -324,6 +325,7 @@ const setAndFetchBlData = async(reset, state, allValues, set, dispatch, blData) 
   allValues.overseas_agent =  fetchedResult[0].overseas_agent?.name;
   allValues.pol =             fetchedResult[0].pol;
   allValues.pofd =            fetchedResult[0].pod;
+  allValues.por =             fetchedResult[0].por;
   allValues.fd =              fetchedResult[0].fd;
   allValues.vessel =          fetchedResult[0].vessel?.name;
   allValues.voyage =          fetchedResult[0].Voyage?.voyage;
@@ -384,6 +386,48 @@ const setAndFetchBlData = async(reset, state, allValues, set, dispatch, blData) 
   reset(result);
 } 
 
+// Browser-safe: parses HTML, inspects <p> elements, and returns cleaned HTML
+function cleanNullParagraphs(html) {
+  // console.log("Original HTML:", html);
+
+  // Normalize common non-breaking spaces to regular spaces
+  html = html.replace(/&nbsp;/gi, ' ');
+
+  // Parse HTML into DOM so we can reliably read textContent
+  const container = document.createElement('div');
+  container.innerHTML = html;
+
+  // Collect kept <p> elements
+  const kept = [];
+  container.querySelectorAll('p').forEach(p => {
+    // Get visible text, normalize whitespace and lowercase for checks
+    let text = p.textContent || '';
+    text = text.replace(/\s+/g, ' ').trim(); // collapse whitespace
+    const lower = text.toLowerCase();
+
+    // Conditions to remove:
+    // - exactly "null" (after trimming)
+    // - empty string
+    // - contains "tel null" (or similar)
+    if (
+      lower === '' ||
+      lower === 'null' ||
+      lower.includes('tel null')
+    ) {
+      return; // skip / remove this paragraph
+    }
+
+    // Keep but normalize spacing inside tag
+    const cleanText = text; // already trimmed/collapsed
+    kept.push(`<p> ${cleanText}</p>`);
+  });
+
+  const result = kept.join('');
+  // console.log("Cleaned HTML:", result);
+  return result;
+}
+
+
 export {
   calculateContainerInfos,
   calculateContainerInfosCopy,
@@ -395,4 +439,5 @@ export {
   initialState,
   baseValues,
   setJob,
+  cleanNullParagraphs
 }
