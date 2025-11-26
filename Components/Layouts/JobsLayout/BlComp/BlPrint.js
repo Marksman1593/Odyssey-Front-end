@@ -31,13 +31,13 @@ const BlPrint = ({allValues, state, borders, heading, border, inputRef, stamps, 
             <Row>
               {/* 1st row left side block  */}
               <Col md={6} className="px-0 ">
-                <div style={{ borderBottom: border, height: 107 }}>
+                <div style={{ borderBottom: border, height: '40mm' }}>
                   <div className={`fw-5 ${heading}`} style={{ lineHeight:1.3 }}>
                     Shipper
                   </div>
                   <div className="bl-print mt-1">{parse(cleanNullParagraphs(state.shipperContent))}</div>
                 </div>
-                <div style={{ borderBottom: border, height: 95, position:"relative" }}>
+                <div style={{ borderBottom: border, height: '29mm', position:"relative" }}>
                   <div className={`fw-5 ${heading}`} style={{ lineHeight:1.2 }}>Consignee Or Order</div>
                   <div className="bl-print" style={{marginTop:2}}>{parse(cleanNullParagraphs(state.consigneeContent))}</div>
                   <div className="bl-print" style={{position:"absolute", top:"70px", width: "250px"  }}> <b>  {!formE && allValues.formE ? `FORM E NUMBER : ${allValues.formE}`:null}</b> </div>

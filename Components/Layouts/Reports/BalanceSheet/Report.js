@@ -9,10 +9,10 @@ const Report = () => {
   const [load, setLoad] = useState(false);
   const [visible, setVisible] = useState(false);
 
-  const [assets, setAssets] = useState([{ total:0.00, Parent_Accounts:[{}] }]);
-  const [liabilities, setLiabilities] = useState([{ total:0.00, Parent_Accounts:[{}] }]);
-  const [capital, setCapital] = useState([{ total:0.00, Parent_Accounts:[{}] }]);
-  const [drawings, setDrawings] = useState([{ total:0.00, Parent_Accounts:[{}] }]);
+  const [assets, setAssets] = useState([{ total:0.00, children:[{}] }]);
+  const [liabilities, setLiabilities] = useState([{ total:0.00, children:[{}] }]);
+  const [capital, setCapital] = useState([{ total:0.00, children:[{}] }]);
+  const [drawings, setDrawings] = useState([{ total:0.00, children:[{}] }]);
   const [earnings, setEarnings] = useState(0.00);
   const [effect, setEffect] = useState(0.00);
   const commas = (a) =>  { return parseFloat(a).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ", ")}
@@ -24,7 +24,7 @@ const Report = () => {
       }
     })
     .then((x)=>{
-      // console.log(x.data)
+      console.log("Balance Sheet", x.data)
       let tempassets = x.data.result.assets;
       let templiabilities = x.data.result.liabilities;
       let tempcapital = x.data.result.capital;
@@ -33,9 +33,9 @@ const Report = () => {
       let tempcosting = x.data.result.costing;
       tempassets.forEach((z) => {
           let total = 0.00;
-          z.Parent_Accounts.forEach((i)=>{
+          z.children.forEach((i)=>{
               let totalParent = 0.00;
-              i.Child_Accounts.forEach((j)=>{
+              i.children.forEach((j)=>{
                   let totalChild = 0.00;
                   j.Voucher_Heads.forEach((k)=>{
                       let totalVoucher = 0.00;
@@ -52,9 +52,9 @@ const Report = () => {
       });
       templiabilities.forEach((z) => {
           let total = 0.00;
-          z.Parent_Accounts.forEach((i)=>{
+          z.children.forEach((i)=>{
               let totalParent = 0.00;
-              i.Child_Accounts.forEach((j)=>{
+              i.children.forEach((j)=>{
                   let totalChild = 0.00;
                   j.Voucher_Heads.forEach((k)=>{
                       let totalVoucher = 0.00;
@@ -71,9 +71,9 @@ const Report = () => {
       });
       tempcapital.forEach((z) => {
           let total = 0.00;
-          z.Parent_Accounts.forEach((i)=>{
+          z.children.forEach((i)=>{
               let totalParent = 0.00;
-              i.Child_Accounts.forEach((j)=>{
+              i.children.forEach((j)=>{
                   let totalChild = 0.00;
                   j.Voucher_Heads.forEach((k)=>{
                       let totalVoucher = 0.00;
@@ -90,9 +90,9 @@ const Report = () => {
       });
       tempdrawings.forEach((z) => {
           let total = 0.00;
-          z.Parent_Accounts.forEach((i)=>{
+          z.children.forEach((i)=>{
               let totalParent = 0.00;
-              i.Child_Accounts.forEach((j)=>{
+              i.children.forEach((j)=>{
                   let totalChild = 0.00;
                   j.Voucher_Heads.forEach((k)=>{
                       let totalVoucher = 0.00;
@@ -109,9 +109,9 @@ const Report = () => {
       });
       tempcosting.forEach((z) => {
           let total = 0.00;
-          z.Parent_Accounts.forEach((i)=>{
+          z.children.forEach((i)=>{
               let totalParent = 0.00;
-              i.Child_Accounts.forEach((j)=>{
+              i.children.forEach((j)=>{
                   let totalChild = 0.00;
                   j.Voucher_Heads.forEach((k)=>{
                       let totalVoucher = 0.00;
@@ -128,9 +128,9 @@ const Report = () => {
       });
       tempselling.forEach((z) => {
           let total = 0.00;
-          z.Parent_Accounts.forEach((i)=>{
+          z.children.forEach((i)=>{
               let totalParent = 0.00;
-              i.Child_Accounts.forEach((j)=>{
+              i.children.forEach((j)=>{
                   let totalChild = 0.00;
                   j.Voucher_Heads.forEach((k)=>{
                       let totalVoucher = 0.00;
@@ -178,7 +178,7 @@ const Report = () => {
       <h4 className='mb-0 pb-0'>Assets</h4>
       {assets.length>0 &&
         <>
-        {assets[0].Parent_Accounts.map((x, i)=>{
+        {assets[0].children.map((x, i)=>{
         return(
             <Row key={i} className='row-btm-line' style={{lineHeight:lineHeight}}>
                 <Col md={6}><div>{x.title}</div></Col>
@@ -192,7 +192,7 @@ const Report = () => {
         </>
       }
       <h4 className='mb-0 pb-0 mt-3'>liabilities</h4>
-      {liabilities[0].Parent_Accounts.map((x, i)=>{
+      {liabilities[0].children.map((x, i)=>{
       return(
         <Row key={i} className='row-btm-line'  style={{lineHeight:lineHeight}}>
           <Col md={6}><div>{x.title}</div></Col>
@@ -204,7 +204,7 @@ const Report = () => {
         <Col md={6}><div className='fl-r'>{commas(liabilities[0].total)}</div></Col>
       </Row>
       <h4 className='mb-0 pb-0 mt-3'>Equity</h4>
-      {capital[0]?.Parent_Accounts.map((x, i)=>{
+      {capital[0]?.children.map((x, i)=>{
       return(
         <Row key={i} className='row-btm-line'  style={{lineHeight:lineHeight}}>
           <Col md={6}><div>{x.title}</div></Col>
@@ -217,7 +217,7 @@ const Report = () => {
       </Row>
       {drawings.length>0 &&
       <>
-        {drawings[0].Parent_Accounts.map((x, i)=>{
+        {drawings[0].children.map((x, i)=>{
         return(
           <Row key={i} className='row-btm-line'  style={{lineHeight:lineHeight}}>
             <Col md={6}><div>{x.title}</div></Col>
