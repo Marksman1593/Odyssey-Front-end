@@ -201,7 +201,27 @@ const BlComp = ({id, blData, partiesData, type}) => {
     <div className="base-page-layout">
       <div className="client-styles" style={{ overflowY: "auto", overflowX: "hidden" }}>
         <form onSubmit={handleSubmit(id != "new" ? onEdit : onSubmit, onError)}>
-          <Tabs defaultActiveKey={state.tabState} activeKey={state.tabState} onChange={(e)=>dispatch({ type:"toggle", fieldName:"tabState", payload:e })}>
+          <Tabs
+          defaultActiveKey={state.tabState}
+          activeKey={state.tabState}
+          onChange={(e)=>dispatch({ type:"toggle", fieldName:"tabState", payload:e })}
+          tabBarExtraContent={
+            allValues.jobNo && (
+              <button
+                type="submit"
+                disabled={state.load ? true : false}
+                className="btn-custom"
+                style={{ marginRight: 10 }}
+              >
+                {state.load ? (
+                  <Spinner animation="border" size="sm" className="mx-3" />
+                ) : (
+                  <>{(type == "SE" || type == "SI") ? "Save BL" : "Save AWBL"}</>
+                )}
+              </button>
+            )
+          }
+          >
             <Tabs.TabPane tab={(type=="SE"||type=="SI")?"BL Info.":"AWB Info"} key="1">
               <BlInfo control={control} id={id} register={register} state={state} useWatch={useWatch} dispatch={dispatch} reset={reset} type={type} currentJobValue={currentJobValue} />
             </Tabs.TabPane>
@@ -225,7 +245,7 @@ const BlComp = ({id, blData, partiesData, type}) => {
               />}
             </Tabs.TabPane>
           </Tabs>
-          {allValues.jobNo && (
+          {/* {allValues.jobNo && (
             <button type="submit" disabled={state.load ? true : false} className="btn-custom mt-3">
               {state.load ? 
                 <Spinner animation="border" size="sm" className="mx-3" />:
@@ -234,7 +254,7 @@ const BlComp = ({id, blData, partiesData, type}) => {
                 </>
                 }
             </button>
-          )}
+          )} */}
         </form>
       </div>
     </div>
