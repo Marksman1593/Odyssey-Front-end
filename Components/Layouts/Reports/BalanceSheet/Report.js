@@ -219,17 +219,11 @@ const renderAccountRows = (account, level = 0) => {
 
     // Render total row for this parent (after all children)
     rows.push(
-      <tr>
-        <td></td>
-        <td style={{ textAlign: "right", fontStyle: "italic" }}>______________</td>
-      </tr>
-    )
-    rows.push(
       <tr key={`${account.id}-total`}>
         <td style={{ paddingLeft: `${(level + 1) * 20}px`, fontStyle: "italic", fontWeight: "bold"  }}>
           Total for {account.title}
         </td>
-        <td style={{ textAlign: "right", fontStyle: "italic" }}>
+        <td style={{ textAlign: "right", fontStyle: "italic", borderTop: "2px solid #000" }}>
           {account.total?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
         </td>
       </tr>
