@@ -25,6 +25,10 @@ const ChargesList = ({state, dispatch, type, append, reset, fields, chargeList, 
   const [generate, setGenerate] = useState(false);
   const [InvoiceBuffer, setInvoiceBuffer] = useState(false);
 
+  useEffect(() => {
+    console.log("InvoiceBuffer Triggered", InvoiceBuffer)
+  }, [InvoiceBuffer]);
+
   const commas = (a) =>  { return parseFloat(a).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ", ")};
 
   useEffect(() => {
@@ -209,8 +213,6 @@ const ChargesList = ({state, dispatch, type, append, reset, fields, chargeList, 
             await autoInvoice(temp, companyId, reset, operationType, dispatch, state, setInvoiceBuffer).then(()=>{
             });
           }
-        }else{
-          setInvoiceBuffer(false)
         }
       }}>Auto Invoice</div>
       <div className='div-btn-custom-green fl-right py-1 px-3 mx-1' style={{cursor: !generate? "not-allowed" : "pointer"}} onClick={async ()=>{
@@ -226,8 +228,6 @@ const ChargesList = ({state, dispatch, type, append, reset, fields, chargeList, 
           }else{
             await autoInvoice(temp, companyId, reset, operationType, dispatch, state, setInvoiceBuffer);
           }
-        }else{
-          setInvoiceBuffer(false)
         }
       }}>Auto Bill</div>
       <div className='div-btn-custom-green fl-right py-1 px-3 mx-1' style={{cursor: !generate? "not-allowed" : "pointer"}} onClick={async ()=>{
@@ -240,8 +240,6 @@ const ChargesList = ({state, dispatch, type, append, reset, fields, chargeList, 
           }else{
             await autoInvoice(temp, companyId, reset, operationType, dispatch, state, setInvoiceBuffer);
           }
-        }else{
-          setInvoiceBuffer(false)
         }
       }}>Auto Agent Invoice</div>
       <div className='mx-2' style={{float:'right'}}>
@@ -557,7 +555,7 @@ const ChargesList = ({state, dispatch, type, append, reset, fields, chargeList, 
             ]}
           />
           </td>
-          <td style={{ padding: 3 }}> {/* Amount */}
+          {(operationType == "SE" || operationType == "SI") && <td style={{ padding: 3 }}> {/* Amount */}
           <InputNumberComp register={register} name={`chargeList.${index}.amount`} control={control} label='' width={20} 
             disabled={(operationType=="AI"||operationType=="AE")?true:permissionAssign(permissions, x)} onChange={(e)=>{
               let tempChargeList = [...chargeList];
@@ -581,7 +579,7 @@ const ChargesList = ({state, dispatch, type, append, reset, fields, chargeList, 
               reset({ chargeList: tempChargeList });
             }}
           />
-          </td>
+          </td>}
           <td style={{ padding: 3 }}>  {/* Discount */}
           <InputNumberComp register={register} name={`chargeList.${index}.discount`} control={control} width={30} font={13} 
             disabled={permissionAssign(permissions, x)} onChange={(e)=>{

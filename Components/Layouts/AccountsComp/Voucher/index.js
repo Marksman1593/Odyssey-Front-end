@@ -31,6 +31,11 @@ const Voucher = ({ id }) => {
         headers:{ "id": `${id}` }
     }).then((x)=>{
       console.log("Id ka Result:", x.data.result)
+      if(x.data.result == null){
+        dispatch(incrementTab({ "label": "Voucher", "key": "3-5", "id": "new" }))
+        dispatch(resetState())
+        Router.push(`/accounts/vouchers/new`)
+      }
       setVoucher(x.data.result)
       dispatch(setField({ field: 'edit', value: true }))
       dispatch(setField({ field: 'id', value: x.data.result.id }))
