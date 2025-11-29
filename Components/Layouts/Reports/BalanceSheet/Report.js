@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Row, Col, Spinner } from 'react-bootstrap';
 import { Select, Radio, Modal } from 'antd';
+import * as XLSX from "xlsx";
+import ExcelJS from "exceljs";
 
 const Report = () => {
 
@@ -27,141 +29,6 @@ const Report = () => {
     .then((x)=>{
       console.log("Balance Sheet", x.data)
       setAccounts(x.data.result.accounts);
-      // let tempassets = x.data.result.assets;
-      // let templiabilities = x.data.result.liabilities;
-      // let tempcapital = x.data.result.capital;
-      // let tempdrawings = x.data.result.drawings;
-      // let tempselling = x.data.result.selling;
-      // let tempcosting = x.data.result.costing;
-      // tempassets.forEach((z) => {
-      //     let total = 0.00;
-      //     z.children.forEach((i)=>{
-      //         let totalParent = 0.00;
-      //         i.children.forEach((j)=>{
-      //             let totalChild = 0.00;
-      //             j.Voucher_Heads.forEach((k)=>{
-      //                 let totalVoucher = 0.00;
-      //                 k.type=="debit"?totalVoucher = totalVoucher + parseFloat(k.amount):totalVoucher = totalVoucher - parseFloat(k.amount);
-      //                 totalChild = totalChild + totalVoucher
-      //             })
-      //             j.totalChild = totalChild;
-      //             totalParent = totalParent + totalChild
-      //         })
-      //         i.totalParent = totalParent
-      //         total = total + totalParent
-      //     })
-      //     z.total = total;
-      // });
-      // templiabilities.forEach((z) => {
-      //     let total = 0.00;
-      //     z.children.forEach((i)=>{
-      //         let totalParent = 0.00;
-      //         i.children.forEach((j)=>{
-      //             let totalChild = 0.00;
-      //             j.Voucher_Heads.forEach((k)=>{
-      //                 let totalVoucher = 0.00;
-      //                 k.type=="credit"?totalVoucher = totalVoucher + parseFloat(k.amount):totalVoucher = totalVoucher - parseFloat(k.amount);
-      //                 totalChild = totalChild + totalVoucher
-      //             })
-      //             j.totalChild = totalChild;
-      //             totalParent = totalParent + totalChild
-      //         })
-      //         i.totalParent = totalParent
-      //         total = total + totalParent
-      //     })
-      //     z.total = total;
-      // });
-      // tempcapital.forEach((z) => {
-      //     let total = 0.00;
-      //     z.children.forEach((i)=>{
-      //         let totalParent = 0.00;
-      //         i.children.forEach((j)=>{
-      //             let totalChild = 0.00;
-      //             j.Voucher_Heads.forEach((k)=>{
-      //                 let totalVoucher = 0.00;
-      //                 k.type=="credit"?totalVoucher = totalVoucher + parseFloat(k.amount):totalVoucher = totalVoucher - parseFloat(k.amount);
-      //                 totalChild = totalChild + totalVoucher
-      //             })
-      //             j.totalChild = totalChild;
-      //             totalParent = totalParent + totalChild
-      //         })
-      //         i.totalParent = totalParent
-      //         total = total + totalParent
-      //     })
-      //     z.total = total;
-      // });
-      // tempdrawings.forEach((z) => {
-      //     let total = 0.00;
-      //     z.children.forEach((i)=>{
-      //         let totalParent = 0.00;
-      //         i.children.forEach((j)=>{
-      //             let totalChild = 0.00;
-      //             j.Voucher_Heads.forEach((k)=>{
-      //                 let totalVoucher = 0.00;
-      //                 k.type=="credit"?totalVoucher = totalVoucher + parseFloat(k.amount):totalVoucher = totalVoucher - parseFloat(k.amount);
-      //                 totalChild = totalChild + totalVoucher
-      //             })
-      //             j.totalChild = totalChild;
-      //             totalParent = totalParent + totalChild
-      //         })
-      //         i.totalParent = totalParent
-      //         total = total + totalParent
-      //     })
-      //     z.total = total;
-      // });
-      // tempcosting.forEach((z) => {
-      //     let total = 0.00;
-      //     z.children.forEach((i)=>{
-      //         let totalParent = 0.00;
-      //         i.children.forEach((j)=>{
-      //             let totalChild = 0.00;
-      //             j.Voucher_Heads.forEach((k)=>{
-      //                 let totalVoucher = 0.00;
-      //                 k.type=="debit"?totalVoucher = totalVoucher + parseFloat(k.amount):totalVoucher = totalVoucher - parseFloat(k.amount);
-      //                 totalChild = totalChild + totalVoucher
-      //             })
-      //             j.totalChild = totalChild;
-      //             totalParent = totalParent + totalChild
-      //         })
-      //         i.totalParent = totalParent
-      //         total = total + totalParent
-      //     })
-      //     z.total = total;
-      // });
-      // tempselling.forEach((z) => {
-      //     let total = 0.00;
-      //     z.children.forEach((i)=>{
-      //         let totalParent = 0.00;
-      //         i.children.forEach((j)=>{
-      //             let totalChild = 0.00;
-      //             j.Voucher_Heads.forEach((k)=>{
-      //                 let totalVoucher = 0.00;
-      //                 k.type=="debit"?totalVoucher = totalVoucher + parseFloat(k.amount):totalVoucher = totalVoucher - parseFloat(k.amount);
-      //                 totalChild = totalChild + totalVoucher
-      //             })
-      //             j.totalChild = totalChild;
-      //             totalParent = totalParent + totalChild
-      //         })
-      //         i.totalParent = totalParent
-      //         total = total + totalParent
-      //     })
-      //     z.total = total;
-      // });
-      // tempselling = tempselling.length>0?tempselling[0].total:0;
-      // tempcosting = tempcosting.length>0?tempcosting[0].total:0;
-      // setAssets(tempassets)
-      // setLiabilities(templiabilities)
-      // // console.log(tempcapital, "<----here")
-      // setCapital(tempcapital)
-      // setDrawings(tempdrawings)
-      // setEarnings(tempselling+tempcosting);
-      // setEffect(tempassets[0].total - ( templiabilities.length>0?templiabilities[0].total:0 + tempcapital.length>0?tempcapital[0].total:0 + tempdrawings.length>0?tempdrawings[0].total:0 + tempselling+tempcosting))
-      // // console.log("assets",tempassets);
-      // // console.log("liabilities",templiabilities);
-      // // console.log("capital",tempcapital);
-      // // console.log("drawings",tempdrawings);
-      // // console.log("selling",tempselling);
-      // // console.log("costing",tempcosting);
     })
     setLoad(false);
     setVisible(true);
@@ -171,6 +38,59 @@ const Report = () => {
   useEffect(()=>{
     handleSubmit()
   }, [])
+
+  const exportToExcel = () => {
+  if (!accounts || accounts.length === 0) return;
+
+  const sheetData = [];
+
+  // Recursively flatten accounts into rows for Excel
+  const pushRows = (account, level = 0) => {
+    if (!account.total || account.total === 0) return; // skip zero balances
+
+    const indent = "    ".repeat(level);
+
+    const isLeaf = !account.children || account.children.length === 0;
+
+    // Push the main row
+    sheetData.push({
+      Account: indent + account.title,
+      Amount: account.total,
+    });
+
+    // Children
+    if (!isLeaf) {
+      account.children.forEach(child => pushRows(child, level + 1));
+
+      // Total row after children
+      sheetData.push({
+        Account: indent + "  Total for " + account.title,
+        Amount: account.total,
+      });
+    }
+  };
+
+  // Apply recursive push to each root category
+  accounts.forEach(acc => pushRows(acc));
+
+  // Create worksheet
+  const worksheet = XLSX.utils.json_to_sheet(sheetData);
+
+  // Format numeric column
+  const range = XLSX.utils.decode_range(worksheet["!ref"]);
+  for (let R = range.s.r + 1; R <= range.e.r; R++) {
+    const cellRef = XLSX.utils.encode_cell({ r: R, c: 1 }); // Amount col = index 1
+    if (worksheet[cellRef]) {
+      worksheet[cellRef].t = "n"; // number type
+    }
+  }
+
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Balance Sheet");
+
+  // Download file
+  XLSX.writeFile(workbook, `BalanceSheet_${Date.now()}.xlsx`);
+};
 
   // Calculate total recursively
 const calculateTotals = (account) => {
@@ -257,83 +177,14 @@ const BalanceSheet = ({ accounts }) => {
 
   return (
   <div className='base-page-layout p-4'>
-    <h4 className='fw-7'>Balance Sheet</h4>
+    <Row>
+      <h4 className='fw-7'>Balance Sheet</h4>
+      <button onClick={exportToExcel} className="text-black btn btn-light border mt-2">
+        Export Balance Sheet to Excel
+      </button>
+    </Row>
     <hr/>
-    <BalanceSheet accounts={accounts} />
-    {/* <div style={{minHeight:650, overflowY:'auto', overflowX:'hidden', fontSize:14, padding:20}}>
-      <h4 className='mb-0 pb-0'>Assets</h4>
-      {assets.length>0 &&
-        <>
-        {assets[0].children.map((x, i)=>{
-        return(
-            <Row key={i} className='row-btm-line' style={{lineHeight:lineHeight}}>
-                <Col md={6}><div>{x.title}</div></Col>
-                <Col md={6}><div className='fl-r'>{commas(x.totalParent)}</div></Col>
-            </Row>
-        )})}
-        <Row className='row-btm-line fw-8'  style={{lineHeight:lineHeight}}>
-            <Col md={6} className='px-4'><div>Total For Assets</div></Col>
-            <Col md={6}><div className='fl-r'>{commas(assets[0].total)}</div></Col>
-        </Row>
-        </>
-      }
-      <h4 className='mb-0 pb-0 mt-3'>liabilities</h4>
-      {liabilities[0].children.map((x, i)=>{
-      return(
-        <Row key={i} className='row-btm-line'  style={{lineHeight:lineHeight}}>
-          <Col md={6}><div>{x.title}</div></Col>
-          <Col md={6}><div className='fl-r'>{commas(x.totalParent)}</div></Col>
-        </Row>
-      )})}
-      <Row className='row-btm-line fw-8'  style={{lineHeight:lineHeight}}>
-        <Col md={6} className='px-4'><div>Total For Liabilities</div></Col>
-        <Col md={6}><div className='fl-r'>{commas(liabilities[0].total)}</div></Col>
-      </Row>
-      <h4 className='mb-0 pb-0 mt-3'>Equity</h4>
-      {capital[0]?.children.map((x, i)=>{
-      return(
-        <Row key={i} className='row-btm-line'  style={{lineHeight:lineHeight}}>
-          <Col md={6}><div>{x.title}</div></Col>
-          <Col md={6}><div className='fl-r'>{commas(x.totalParent)}</div></Col>
-        </Row>
-      )})}
-      <Row className='row-btm-line fw-8'  style={{lineHeight:lineHeight}}>
-        <Col md={6} className='px-4'><div>Total For Capital</div></Col>
-        <Col md={6}><div className='fl-r'>{capital.length>0? commas(capital[0]?.total):'0.00'}</div></Col>
-      </Row>
-      {drawings.length>0 &&
-      <>
-        {drawings[0].children.map((x, i)=>{
-        return(
-          <Row key={i} className='row-btm-line'  style={{lineHeight:lineHeight}}>
-            <Col md={6}><div>{x.title}</div></Col>
-            <Col md={6}><div className='fl-r'>{commas(x.totalParent)}</div></Col>
-          </Row>
-        )})}
-        <Row className='row-btm-line fw-8'  style={{lineHeight:lineHeight}}>
-          <Col md={6} className='px-4'><div>Total For Drawings</div></Col>
-          <Col md={6}><div className='fl-r '>{commas(drawings[0]?.total)}</div></Col>
-        </Row>
-      </>
-      }
-      <Row className='row-btm-line'  style={{lineHeight:lineHeight}}>
-        <Col md={6} className=''><div>Profit & Loss Summary</div></Col>
-        <Col md={6}><div className='fl-r '>{commas(earnings)}</div></Col>
-      </Row>
-      <Row className='row-btm-line fw-8'  style={{lineHeight:lineHeight}}>
-        <Col md={6} className='px-4'><div>Total for Profit & Loss Summary</div></Col>
-        <Col md={6}><div className='fl-r '>{commas(earnings)}</div></Col>
-      </Row>
-      <Row className='row-btm-line'  style={{lineHeight:lineHeight}}>
-        <Col md={6} className=''><div>{effect>0?"Asset":"Liability"} Effect On Equity</div></Col>
-        <Col md={6}><div className='fl-r '>{commas(effect)}</div></Col>
-      </Row>
-      <Row className='row-btm-line fw-8'  style={{lineHeight:lineHeight}}>
-        <Col md={6} className='px-4'><div>Total for Equity & Liability</div></Col>
-        <Col md={6}><div className='fl-r '>{commas(assets[0].total)} </div></Col>
-      </Row>
-    </div> */}
-    
+    <BalanceSheet accounts={accounts.slice(0, 2)} />    
   </div>
   )
 }
