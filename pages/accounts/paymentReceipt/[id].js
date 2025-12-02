@@ -43,8 +43,8 @@ export default paymentReceipt;
 export async function getServerSideProps(context) {
   const { params, query } = context;
   let voucherData = {};
-    console.log(params)
-    console.log(">>",query)
+    // console.log(params)
+    // console.log(">>",query)
   // Check cache first (cache key can be the `id`)
   if (cache[params.id]) {
     console.log('Returning cached data');

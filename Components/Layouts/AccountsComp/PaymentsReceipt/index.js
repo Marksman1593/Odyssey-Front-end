@@ -267,9 +267,9 @@ const PaymentsReceipt = ({ id, voucherData, q }) => {
   }
 
   useEffect(() => {
-    // console.log(id, state.voucherId)
+    // console.log("State ID Check>>>", id, state.voucherId)
     (id!=undefined&&state.selectedAccount==undefined)||id!=state.voucherId?state.oldVouchers.find((x) => x.id == id)?openOldVouchers(state.oldVouchers.find((x) => x.id == id)):null:null
-  })
+  }, [id])
 
   useEffect(() => {
     if(q.partyId){

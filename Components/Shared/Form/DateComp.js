@@ -36,7 +36,7 @@ const NumComp = (props) => {
       <>
         <div>{props.label}</div>
         <DatePicker name={fieldName} 
-     
+        format="DD-MM-YYYY"
         onChange={onChange} value={selectedDate} ref={ref} onBlur={onBlur} style={{minWidth:props.width, fontSize:12}} />
       </>
     )
