@@ -102,7 +102,7 @@ const commas = (a) =>  { return parseFloat(a).toFixed(2).toString().replace(/\B(
   // main render
   return (
     <>
-      <PrintTopHeader report={report} query={query} />
+      <PrintTopHeader company={query.company} report={report} query={query} />
       <div className="report-table income-statement-report" style={{fontSize: "14px"}}>
         <div style={{ fontWeight: "bold" }}>Revenue</div>
         {revenue.length > 0 ? revenue.map(account => (

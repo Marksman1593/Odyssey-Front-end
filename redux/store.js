@@ -12,6 +12,9 @@ import profitLossReducer from './profitLoss/profitLossSlice'
 import openingInvoiceSlice from './openingInvoices/openingInvoicesSlice';
 import paymentRecieptSlice from './paymentReciept/paymentRecieptSlice';
 import voucherSlice from './vouchers/voucherSlice';
+import directJobReducer from './directJob/directJobSlice';
+import directJobSlice from './directJob/directJobSlice';
+
 export const store = configureStore({
   reducer: {
     [seJobValues.reducerPath]: seJobValues.reducer,
@@ -27,6 +30,7 @@ export const store = configureStore({
     openingInvoice:openingInvoiceSlice,
     paymentReciept:paymentRecieptSlice,
     vouchers:voucherSlice,
+    directJob: directJobSlice,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(seJobValues.middleware),

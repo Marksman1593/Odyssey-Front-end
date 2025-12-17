@@ -18,6 +18,7 @@ import { resetState } from '/redux/paymentReciept/paymentRecieptSlice';
 import { ledgerReset } from '../../redux/ledger/ledgerSlice';
 import { resetOpeningInvoice } from '../../redux/openingInvoices/openingInvoicesSlice';
 import { resetVouchers } from '../../redux/vouchers/voucherSlice';
+import { resetDirectJob } from '../../redux/directJob/directJobSlice';
 
 const { Header, Content, Sider } = Layout;
 
@@ -173,6 +174,12 @@ const MainLayout = ({children}) => {
     if(newRouter.pathname==="/accounts/voucherList"){
       setToggleState('3-6');
     }
+    if(newRouter.pathname==="/accounts/directJob/[id]" || newRouter.pathname===("/accounts/directJob/new")){
+      setToggleState('3-15');
+    }
+    if(newRouter.pathname==="/accounts/directJobList"){
+      setToggleState('3-16');
+    }
     if(newRouter.pathname==="/accounts/officeVouchers/list"){
       setToggleState('3-7');
     }
@@ -297,6 +304,8 @@ const MainLayout = ({children}) => {
         else if(tabs.key=='3-10'){ tempTabActive.openingBalance=true }
         else if(tabs.key=='3-11'){ tempTabActive.openingInvoicesList=true }
         else if(tabs.key=='3-12'){ tempTabActive.openingInvoice=true }
+        else if(tabs.key=='3-15'){ tempTabActive.directJob=true }
+        else if(tabs.key=='3-16'){ tempTabActive.directJobList=true }
         else if(tabs.key=='4-1'){ tempTabActive.seJobList=true }
         else if(tabs.key=='4-2'){ tempTabActive.seBl=true }
         else if(tabs.key=='4-3'){ tempTabActive.seJob=true }
@@ -396,6 +405,18 @@ const MainLayout = ({children}) => {
     else if(x.key=='3-10'){ Router.push(`/accounts/openingBalance/${setKey(x)}`) }
     else if(x.key=='3-11'){ Router.push(`/accounts/openingInvoices/list`) }
     else if(x.key=='3-12'){ Router.push(`/accounts/openingInvoices/${setKey(x)}`) }
+    else if(x.key=='3-15'){ 
+      //console.log(x);
+      if(x.id){
+        Router.push(`/accounts/directJob/${setKey(x)}`)
+      } else {
+        dispatch(resetDirectJob())
+        setKey({...x, id:'new'})
+        Router.push(`/accounts/directJob/new`)
+      }
+    }
+    // else if(x.key=='3-15'){ Router.push(`/accounts/directJob`) }
+    else if(x.key=='3-16'){ Router.push(`/accounts/directJobList`) }
     else if(x.key=='4-1'){ Router.push('/seaJobs/seJobList') }
     else if(x.key=='4-2'){ Router.push('/seaJobs/export/blList') }
     else if(x.key=='4-3'){ Router.push(`/seaJobs/export/${setKey(x)}`) } //these routes are also settled in 2nd useEffect

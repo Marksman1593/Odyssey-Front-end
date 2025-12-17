@@ -31,11 +31,7 @@ const Ledger = () => {
   const getAccounts = async () => {
    
     try{  
-      const gotAccounts = await axios.get(process.env.NEXT_PUBLIC_CLIMAX_GET_ALL_CHILD_ACCOUNTS, {
-      headers: {
-        companyid: company
-      } });
-
+      const gotAccounts = await axios.get(process.env.NEXT_PUBLIC_CLIMAX_GET_ALL_CHILD_ACCOUNTS);
         const {data}= gotAccounts;
         const {result} = data
         let temprecords=[];
@@ -45,16 +41,9 @@ const Ledger = () => {
             });
             dispatch(setRecords(temprecords));
             getAccountName(temprecords);
-  
-     
     }catch(e){
-      // console.log("e",e)
-
+      console.log("e",e)
     }
-  
-
-
-
   };
 
   const getAccountName = (temprecords) =>{

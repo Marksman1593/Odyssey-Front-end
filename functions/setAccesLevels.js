@@ -64,26 +64,26 @@ function setAccesLevels(dispatch, collapsed){
       key: '2-1',
       children: 'Content of Tab Pane 2',
     }):null,
-    (levels?.includes("ClientList")||levels?.includes("admin"))?getItem('Client List ', '2-2',<></>, null, {
-      label: `Client List`,
+    (levels?.includes("ClientList")||levels?.includes("admin"))?getItem('Parties ', '2-2',<></>, null, {
+      label: `Parties`,
       key: '2-2',
       children: `Content of Tab Pane 2`,
     }):null,
-    (levels?.includes("Parties")||levels?.includes("admin"))?getItem('Parties', '2-20',<></>, null, {
-      label: `Parties`,
-      key: '2-20',
-      children: `Content of Tab Pane 2`,
-    }):null,
-    (levels?.includes("VendorList")||levels?.includes("admin"))?getItem('Vendor List', '2-5',<></>, null, {
-      label: `Vendor List`,
-      key: '2-5',
-      children: `Content of Tab Pane 2`,
-    }):null,
-    (levels?.includes("NonGLParties")||levels?.includes("admin"))?getItem('Non-GL Parties', '2-9',<></>, null, {
-      label: `Non-GL Parties`,
-      key: '2-9',
-      children: `Content of Tab Pane 2`,
-    }):null,
+    // (levels?.includes("Parties")||levels?.includes("admin"))?getItem('Parties', '2-20',<></>, null, {
+    //   label: `Parties`,
+    //   key: '2-20',
+    //   children: `Content of Tab Pane 2`,
+    // }):null,
+    // (levels?.includes("VendorList")||levels?.includes("admin"))?getItem('Vendor List', '2-5',<></>, null, {
+    //   label: `Vendor List`,
+    //   key: '2-5',
+    //   children: `Content of Tab Pane 2`,
+    // }):null,
+    // (levels?.includes("NonGLParties")||levels?.includes("admin"))?getItem('Non-GL Parties', '2-9',<></>, null, {
+    //   label: `Non-GL Parties`,
+    //   key: '2-9',
+    //   children: `Content of Tab Pane 2`,
+    // }):null,
     (levels?.includes("Commodity")||levels?.includes("admin"))?getItem('Commodity', '2-3',<></>, null, {
       label: `Commodity`,
       key: '2-3',
@@ -126,6 +126,16 @@ function setAccesLevels(dispatch, collapsed){
     (levels?.includes("VoucherList")||levels?.includes("admin"))?getItem('Voucher List', '3-6',<></>, null, {
       label: `Voucher List`,
       key: '3-6',
+      children: `Content of Tab Pane 2`,
+    }):null,
+    (levels?.includes("DirectJobList")||levels?.includes("admin"))?getItem('Direct Job E / R', '3-15',<></>, null, {
+      label: `Direct Job E / R`,
+      key: '3-15',
+      children: `Content of Tab Pane 2`,
+    }):null,
+    (levels?.includes("DirectJobList")||levels?.includes("admin"))?getItem('Direct Job List', '3-16',<></>, null, {
+      label: `Direct Job List`,
+      key: '3-16',
       children: `Content of Tab Pane 2`,
     }):null,
     (levels?.includes("OfficeVoucherList")||levels?.includes("admin"))?getItem('Office Voucher List', '3-7',<></>, null, {

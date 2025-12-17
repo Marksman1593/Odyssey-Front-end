@@ -23,3 +23,217 @@ a {
 .edit-charge-body{
   border: 1px solid grey;
 }
+
+.delete-btn{
+  height: 35px !important;
+  width: 35px !important;
+  border-radius: 50% !important;
+  /* border: 1px solid black !important; */
+  background-color: white !important;
+  display: flex !important;            /* center icon */
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.21) !important;
+}
+
+.delete-btn:hover{
+  background-color: #DC2626 !important;
+  transition: all 0.3s ease-in-out !important;
+}
+
+.delete-btn1{
+  height: 40px !important;
+  width: 40px !important;
+  border-radius: 50% !important;
+  /* border: 1px solid black !important; */
+  background-color: white !important;
+  display: flex !important;            /* center icon */
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.21) !important;
+}
+
+.delete-btn1:hover{
+  background-color: #DC2626 !important;
+  transition: all 0.3s ease-in-out !important;
+}
+
+.edit-btn{
+  height: 35px !important;
+  width: 35px !important;
+  border-radius: 50% !important;
+  background-color: white !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.21) !important;
+}
+
+.edit-btn:hover{
+  background-color: #1f2937 !important;
+  transition: all 0.3s ease-in-out !important;
+}
+
+.edit-btn1{
+  height: 40px !important;
+  width: 40px !important;
+  border-radius: 50% !important;
+  background-color: white !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.21) !important;
+}
+
+.edit-btn1:hover{
+  background-color: #1f2937 !important;
+  transition: all 0.3s ease-in-out !important;
+}
+
+.delete-btn .delete-icon {
+  color: #1f2937 !important;
+  transition: 0.2s !important;
+}
+
+.delete-btn:hover .delete-icon {
+  color: white !important;
+}
+
+.delete-btn1 .delete-icon {
+  color: #1f2937 !important;
+  transition: 0.2s !important;
+}
+
+.delete-btn1:hover .delete-icon {
+  color: white !important;
+}
+
+.edit-btn .edit-icon {
+  color: #1f2937 !important;
+  transition: 0.2s !important;
+}
+
+.edit-btn1:hover .edit-icon {
+  color: white !important;
+}
+
+.edit-btn1 .edit-icon {
+  color: #1f2937 !important;
+  transition: 0.2s !important;
+}
+
+.edit-btn:hover .edit-icon {
+  color: white !important;
+}
+
+.voucher-box{
+  margin-Top: 20px;
+  width: 100%;
+  height: 150px;
+  border-Radius: 8px;
+  padding: 10px 25px;
+  box-Shadow: 0px 0px 10px rgba(0, 0, 0, 0.21);
+}
+
+.voucher-box:hover{
+  height: 155px;
+  box-Shadow: 0px 0px 15px rgba(0, 0, 0, 0.31);
+  transition: all 0.3s ease-in-out;
+}
+
+.custom-label{
+  color: #1f2937;
+  font-size: 16px;
+  font-weight: 400;
+  margin-bottom: 5px;
+  margin-top: 10px;
+}
+
+.table-row{
+  /* display: flex; */
+  align-items: center;
+  justify-content: space-between;
+  border-right: '1px solid #1f2937';
+  border-left: '1px solid #1f2937';
+}
+
+.table-row1{
+  /* display: flex; */
+  align-items: center;
+  justify-content: space-between;
+  border-right: '1px solid #1f2937';
+  border-left: '1px solid #1f2937';
+  padding-left: 5px;
+}
+
+.totals-box {
+  position: relative;
+  border: 1px solid #d9d9d9;
+  border-radius: 10px;
+  padding: 20px 25px;
+  margin-top: 20px;
+  background: white;
+}
+
+.totals-label {
+  position: absolute;
+  top: -12px;
+  left: 20px;
+  background: white;
+  padding: 0px 12px;
+  font-weight: 600;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  font-size: 15px;
+}
+
+.totals-content {
+  display: flex;
+  justify-content: space-between;
+  font-size: 15px;
+}
+
+.totals-content p {
+  margin: 4px 0;
+}
+
+.totals-content span {
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.number-cell {
+  position: relative;
+  text-align: center;
+  width: 50px; /* adjust */
+}
+
+.number-cell .number {
+  opacity: 1;
+  transition: opacity 0.2s ease;
+}
+
+.number-cell .delete-btn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  border: none;
+  cursor: pointer;
+  background: #ff4d4f;
+  color: white;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 12px;
+  transition: opacity 0.2s ease;
+}
+
+.number-cell:hover .number {
+  opacity: 0; /* hide number on hover */
+}
+
+.number-cell:hover .delete-btn {
+  opacity: 1; /* show delete button */
+}
+

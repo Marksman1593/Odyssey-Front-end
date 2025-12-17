@@ -1,13 +1,3 @@
-// import React, { useState, useEffect, useMemo } from 'react';
-// import { useDispatch } from 'react-redux';
-// import { Row, Col, Table } from 'react-bootstrap';
-// import { incrementTab } from '/redux/tabs/tabSlice';
-// import { RiDeleteBin2Fill, RiEdit2Fill } from "react-icons/ri";
-// import Router from 'next/router';
-// import moment from 'moment';
-// import axios from 'axios';
-// import PopConfirm from '../../../Shared/PopConfirm';
-// import Pagination from '../../../Shared/Pagination';
 import { Tabs } from 'antd';
 import ListData from './list/List';
 import { useSelector } from 'react-redux';

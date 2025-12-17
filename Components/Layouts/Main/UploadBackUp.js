@@ -22,10 +22,10 @@ const Upload_CoA = () => {
         {/* <button onClick={()=>{importAECharges()}} style={{width: 'auto'}} className='btn-custom mt-3 px-3 mx-3'>11. Import AE Charges from Climax DB</button> */}
         // await importCommodities()
         // await importVoyages()
-        await importCOA()
-        await importCharges()
-        await importParties()
-        // await importJobs()
+        // await importCOA()
+        // await importCharges()
+        // await importParties()
+        await importJobs()
         // await importVouchers()
         // await checkInvoices()
         // await importAirPorts()
@@ -912,20 +912,20 @@ const importJobs = async () => {
 
         // const result1 = await axios.post(`${process.env.NEXT_PUBLIC_CLIMAX_MAIN_URL}/seaJob/UploadAIJobs`,SIJobs.slice(100, 150));
         
-        for (let i = 0; i < SIJobs.length; i += 10) {
-            const chunk = SIJobs.slice(i, i + 10);
-            console.log(`Sending records ${i} - ${i + chunk.length}`);
+        // for (let i = 0; i < SIJobs.length; i += 10) {
+        //     const chunk = SIJobs.slice(i, i + 10);
+        //     console.log(`Sending records ${i} - ${i + chunk.length}`);
             
-            try {
-                const result = await axios.post(
-                `${process.env.NEXT_PUBLIC_CLIMAX_MAIN_URL}/seaJob/UploadAIJobs`,
-                chunk
-                );
-                console.log("Batch success:", result.data);
-            } catch (err) {
-                console.error("Batch error:", err.message);
-            }
-        }
+        //     try {
+        //         const result = await axios.post(
+        //         `${process.env.NEXT_PUBLIC_CLIMAX_MAIN_URL}/seaJob/UploadAIJobs`,
+        //         chunk
+        //         );
+        //         console.log("Batch success:", result.data);
+        //     } catch (err) {
+        //         console.error("Batch error:", err.message);
+        //     }
+        // }
 
     }catch(e){
         console.error(e)
@@ -933,7 +933,7 @@ const importJobs = async () => {
 
     try{
         console.log("Fetching SE Job data")
-        const { data } = await axios.get("http://localhost:8081/jobs/getAllSE");
+        // const { data } = await axios.get("http://localhost:8081/jobs/getAllSE");
         console.log("SE Job Data:", data)
 
         const createMap = (arr, key) => new Map(arr.map(item => [item[key], item]));
@@ -1174,7 +1174,7 @@ const importJobs = async () => {
 
     try{
         console.log("Fetching SI Job data")
-        const { data } = await axios.get("http://localhost:8081/jobs/getAllSI");
+        // const { data } = await axios.get("http://localhost:8081/jobs/getAllSI");
         console.log("SI Job Data:", data)
 
         const createMap = (arr, key) => new Map(arr.map(item => [item[key], item]));
@@ -1417,7 +1417,7 @@ const importJobs = async () => {
         console.log("Starting Invoices Data Fetch...")
 
         //Fetch data from Climax DB API
-        const { data } = await axios.post("http://localhost:8081/voucher/getAll");
+        // const { data } = await axios.post("http://localhost:8081/voucher/getAll");
         console.log("Data Fetched Successfully", data)
 
         const createMap = (arr, key) => new Map(arr.map(item => [item[key], item]));
