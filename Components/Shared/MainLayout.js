@@ -410,7 +410,7 @@ const MainLayout = ({children}) => {
       if(x.id){
         Router.push(`/accounts/directJob/${setKey(x)}`)
       } else {
-        dispatch(resetDirectJob())
+        // dispatch(resetDirectJob())
         setKey({...x, id:'new'})
         Router.push(`/accounts/directJob/new`)
       }

@@ -4,7 +4,7 @@ import moment from 'moment';
 
 const initialState = {
     directJob_Id: '',
-    directJob_EntryNumber: 'SNS-AEJ-1/26',
+    directJob_EntryNumber: '',
     directJob_JobId:0,
     directJob_JobNumber:"",
     directJob_ExRate: 1,
@@ -24,11 +24,13 @@ const initialState = {
     directJob_DrawnAt: "",
     directJob_ClosingBalance: 0.0,
     directJob_Edit: false,
+    directJob_VoucherId: '',
     directJob_VoucherNumber: '',
     directJob_SettlementAccounts: [],
     directJob_CAccounts: [],
     directJob_Charges: [],
     directJob_Jobs: [],
+    directJob_Total: 0,
     directJob: [
       {
         id: 0,
@@ -37,8 +39,8 @@ const initialState = {
         Charge: '',
         FileNumber: '',
         Basis: '',
-        Currency: 'PKR',
-        RateGroup: '',
+        Currency: '',
+        RateGroup: 'None',
         SizeType: '',
         Quantity: 0.0,
         Rate: 0.0,

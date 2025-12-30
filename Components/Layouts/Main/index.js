@@ -22,7 +22,8 @@ const Main = ({ sessionData, chartData }) => {
 
   return (
     <div className="base-page-layout">
-      {username == 'Saad' && <VannaChat /> }
+      {/* {username == 'Saad' && <VannaChat /> } */}
+      {/* {username == 'Saad' && <UploadBackUp /> } */}
     </div>
   );
 };
