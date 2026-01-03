@@ -5,7 +5,7 @@ const initialState = {
   CompanyId:1,
   currency:"PKR",
   exRate:"1.00",
-  chequeDate:moment(),
+  chequeDate:moment().toISOString(),
   chequeNo:"",
   costCenter:"KHI",
   payTo:"",
@@ -14,7 +14,7 @@ const initialState = {
   vType:"",
   voucher_id: "",
   voucher_No: "",
-  date: moment(),
+  date: moment().toISOString(),
   settlementAccounts: [],
   cAccounts: [],
   settlementAccount: undefined,
@@ -25,7 +25,7 @@ const initialState = {
     narration: "",
     settlement: "",
     accountType: "payAccount",
-    createdAt: moment()
+    createdAt: moment().toISOString()
   },
   Voucher_Heads: [],
   debitTotal: 0.0,

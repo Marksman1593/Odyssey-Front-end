@@ -3,8 +3,8 @@ import moment from 'moment';
 import Cookies from 'js-cookie';
 
   const initialState = {
-    from: moment("2023-07-01"),
-    to: moment(),
+    from: moment("2023-07-01").toISOString(),
+    to: moment().toISOString(),
     company: 1,
     currency: "PKR",
     records: [],

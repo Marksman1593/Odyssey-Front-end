@@ -87,12 +87,12 @@ const Ledger = () => {
       <Col md={3} className="mt-3">
         <b>From</b>
         {/* <Form.Control type={"date"} size="sm" value={from} onChange={(e) => dispatch(setFrom(e.target.value))} /> */}
-          <DatePicker allowClear={false} format="DD-MM-YYYY" value={from} onChange={(e)=>{dispatch(setFrom(e))}}/>
+          <DatePicker allowClear={false} format="DD-MM-YYYY" value={moment(from)} onChange={(e)=>{dispatch(setFrom(e))}}/>
       </Col>
       <Col md={3} className="mt-3">
         <b>To</b>
         {/* <Form.Control type={"date"} size="sm" value={to} onChange={(e) => dispatch(setTo(e.target.value))} /> */}
-        <DatePicker allowClear={false} format="DD-MM-YYYY" value={to} onChange={(e)=>{dispatch(setTo(e))}}/>
+        <DatePicker allowClear={false} format="DD-MM-YYYY" value={moment(to)} onChange={(e)=>{dispatch(setTo(e))}}/>
       </Col>
       <Col md={6}></Col>
       <Col md={3} className="my-3">

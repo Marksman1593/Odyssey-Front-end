@@ -484,7 +484,7 @@ const BillComp = ({back, companyId, state, dispatch}) => {
         </Col>
         <Col md={2}>
         <span style={{marginLeft: '5px', width: '100%'}}>Cheque Date</span>
-          <DatePicker disabled={state.transactionMode=="Cash"} style={{width: '100%'}} value={state.checkDate} onChange={(e) => dispatch(setField({ field: 'checkDate', value: e }))}></DatePicker>
+          <DatePicker disabled={state.transactionMode=="Cash"} style={{width: '100%'}} value={moment(state.checkDate)} onChange={(e) => dispatch(setField({ field: 'checkDate', value: e }))}></DatePicker>
         </Col>
         <Col md={4}>
         <span style={{marginLeft: '5px'}}>{state.payType!="Recievable"?"Paying":"Receiving"} Account*</span>

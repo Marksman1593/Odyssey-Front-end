@@ -468,6 +468,9 @@ const MainLayout = ({children}) => {
     if(index == '3-5'){
       dispatch(resetVouchers())
     }
+    if(index == '3-15'){
+      dispatch(resetDirectJob())
+    }
     let tempTabs = [...tabItems];
     tempTabs = tempTabs.filter((x)=>{
       return x.key!=index

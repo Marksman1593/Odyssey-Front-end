@@ -1,6 +1,9 @@
-import { DeleteOutlined, DollarOutlined, EditOutlined, PlusOutlined, SaveOutlined, SearchOutlined, WarningOutlined } from "@ant-design/icons";
+import { DeleteOutlined, DollarOutlined, EditOutlined, LoadingOutlined, PlusOutlined, SaveOutlined, SearchOutlined, WarningOutlined } from "@ant-design/icons";
 import { Button, Col, Input, Row, Pagination, InputNumber, Select, DatePicker, Checkbox, Modal } from "antd";
+import PopConfirm from '/Components/Shared/PopConfirm';
+import { incrementTab, removeTabNew } from '/redux/tabs/tabSlice';
 import moment from "moment";
+import Router from 'next/router';
 import { useEffect, useState } from "react";
 import { setDJField, resetDirectJob, updateDirectJobItem } from '/redux/directJob/directJobSlice';
 import { useDispatch, useSelector } from "react-redux";
@@ -12,6 +15,111 @@ import Operation from "antd/lib/transfer/operation";
 const commas = (a) => a == 0 ? '0.00' : parseFloat(a).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
 
 const DirectJob = ({ id }) => {
+
+    const state = useSelector((state) => state.directJob);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const res = await axios.get(
+                `${process.env.NEXT_PUBLIC_CLIMAX_MAIN_URL}/voucher/getDirectJob`,
+                {
+                    headers: {
+                    id: id   // <-- whatever your ID value is
+                    }
+                }
+                );
+                console.log("Data Fetched", res.data.result)
+                dispatch(resetDirectJob());
+                dispatch(setDJField({ field: "directJob_Id", value: parseInt(res.data.result.id) }));
+                dispatch(setDJField({ field: "directJob_Account", value: parseInt(res.data.result.Account_No) }));
+                dispatch(setDJField({ field: "directJob_ChequeDate", value: res.data.result.Cheque_Date }));
+                dispatch(setDJField({ field: "directJob_ChequeNo", value: res.data.result.Cheque_No }));
+                dispatch(setDJField({ field: "directJob_Currency", value: res.data.result.Currency }));
+                dispatch(setDJField({ field: "directJob_DrawnAt", value: res.data.result.Drawn_At }));
+                dispatch(setDJField({ field: "directJob_EntryNumber", value: res.data.result.Entry_No }));
+                dispatch(setDJField({ field: "directJob_ExRate", value: res.data.result.Ex_Rate }));
+                dispatch(setDJField({ field: "directJob_JobType", value: res.data.result.Job_Type }));
+                dispatch(setDJField({ field: "directJob_Operation", value: res.data.result.Operation }));
+                dispatch(setDJField({ field: "directJob_PaidTo", value: res.data.result.Paid_To }));
+                dispatch(setDJField({ field: "directJob_Reference", value: res.data.result.Reference_No }));
+                dispatch(setDJField({ field: "directJob_SubType", value: res.data.result.SubType }));
+                dispatch(setDJField({ field: "directJob_EntryDate", value: res.data.result.Entry_Date }));
+                dispatch(setDJField({ field: "directJob_TransMode", value: res.data.result.Tran_Mode }));
+                dispatch(setDJField({ field: "directJob_Type", value: res.data.result.Type }));
+                dispatch(setDJField({ field: "directJob_EntryDate", value: res.data.result.updatedAt }));
+                // dispatch(setDJField({ field: "directJob_Remarks", value: res.data.result.Remarks }));
+                dispatch(setDJField({ field: "directJob_VoucherNumber", value: res.data.result.Associations[0].Voucher.voucher_Id }));
+                dispatch(setDJField({ field: "directJob_VoucherId", value: res.data.result.Associations[0].Voucher.id }));
+                let ass = []
+                res.data.result.Associations.forEach((x, i) => {
+                    ass.push({
+                        id: x.id,
+                        JobId: x.Job_Id,
+                        JobNumber: x.Job_No,
+                        Charge: parseInt(x.Charge_Name),
+                        FileNumber: x.File_No,
+                        Basis: x.Basis,
+                        Currency: x.Currency,
+                        RateGroup: x.Rate_Group,
+                        SizeType: x.Size_Type,
+                        Quantity: x.Quantity,
+                        Rate: x.Amount,
+                        Amount: x.Amount * x.Quantity,
+                        Discount: x.Discount,
+                        NetAmount: (x.Amount * x.Quantity) - x.Discount,
+                        TaxApply: x.Tax_Apply,
+                        TaxAmount: x.Tax_Amount,
+                        VATCategory: x.VAT_Category,
+                        NetIncTaxAmount: (x.Amount * x.Quantity) - x.Discount - x.Tax_Amount,
+                        ExRate: x.Ex_Rate,
+                        LocalAmount: ((x.Amount * x.Quantity) - x.Discount - x.Tax_Amount) * x.Ex_Rate,
+                        Description: x.Description,
+                    },)
+                });
+                dispatch(setDJField({ field: "directJob", value: ass }));
+            }catch(e){
+                console.log(e)
+            }
+        }
+
+        if(state.directJob_CAccounts.length > 0 && id != null){
+            fetchData();
+        }
+    }, [id, state.directJob_CAccounts])
+
+    const deleteData = async (id) => {
+        try {
+            PopConfirm(
+            "Confirmation",
+            "Are You Sure You Want To Delete This?",
+            async () => {
+                setLoading(true);
+
+                console.log(id); // use the id parameter
+
+                // Call backend
+                await axios.post(
+                `${process.env.NEXT_PUBLIC_CLIMAX_MAIN_URL}/voucher/deleteDirectJob`,
+                {}, // body
+                { headers: { id: parseInt(id) } } // send the id in headers
+                );
+
+                // Run after deletion
+                dispatch(resetDirectJob());
+                openNotification('Success', `Direct Job Deleted`, 'green');
+                setLoading(false);
+                dispatch(removeTabNew('3-15')); // just pass the number directly
+                await Router.push(`/accounts/directJobList`)
+            }
+            );
+        } catch (e) {
+            console.log(e);
+            setLoading(false);
+        }
+    };
+
+
     const [ loading, setLoading ] = useState(false);
     const [ show, setShow ] = useState(false);
     const [ selector, setSelector ] = useState({
@@ -19,7 +127,6 @@ const DirectJob = ({ id }) => {
         index: 0
     });
     const dispatch = useDispatch();
-    const state = useSelector((state) => state.directJob);
 
     const [search, setSearch] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
@@ -27,66 +134,149 @@ const DirectJob = ({ id }) => {
 
     const totalRecords = state.directJob_Total || 0;
 
-    const handleSave = async (edit) => {
-        try{
-            let companyId = Cookies.get('companyId')
-            let direct_Job = {
-                Entry_No: state.directJob_EntryNumber,
-                Entry_Date: state.directJob_EntryDate,
-                Type: state.directJob_Type,
-                Reference_No: state.directJob_Reference,
-                Operation: state.directJob_Operation,
-                Job_Type: state.directJob_JobType,
-                SubType: state.directJob_SubType,
-                Cheque_No: state.directJob_ChequeNo,
-                Cheque_Date: state.directJob_ChequeDate,
-                Currency: state.directJob_Currency,
-                Ex_Rate: state.directJob_Currency == 'PKR' ? 1 : state.directJob_JobType == 'single' ? state.directJob[0].ExRate: state.directJob_ExRate,
-                Tran_Mode: state.directJob_TransMode,
-                Drawn_At: state.directJob_DrawnAt,
-                Account_No: state.directJob_Account,
-                Paid_To: state.directJob_PaidTo,
-                Paid_Name: state.directJob_CAccounts.find((x) => x.id == state.directJob_PaidTo).name,
-                Narration: state.directJob_Remarks,
-                companyId,
-                Add_By: Cookies.get('userName'),
-            }
-            let direct_Job_Association = [];
-            for(let job of state.directJob){
-                direct_Job_Association.push({
-                    Job_No: job.JobNumber,
-                    File_No: job.FileNumber,
-                    Charge_Name: job.Charge,
-                    Basis: job.Basis,
-                    Rate_Group: job.RateGroup,
-                    Size_Type: job.SizeType,
-                    Quantity: job.Quantity,
-                    Currency: job.Currency,
-                    Ex_Rate: job.ExRate,
-                    Amount: job.Amount,
-                    Discount: job.Discount,
-                    Tax_Apply: job.TaxApply,
-                    Tax_Amount: job.TaxAmount,
-                    VAT_Catagory: job.VATCategory,
-                    Description: job.Description,
-                    Job_Id: job.JobId,
-                })
-            }
-            console.log("Direct Job to be saved", { direct_Job, direct_Job_Association })
-            if(!edit){
-                const result = await axios.post(`${process.env.NEXT_PUBLIC_CLIMAX_MAIN_URL}/voucher/createDirectJob`, { direct_Job, direct_Job_Association });
-                dispatch(setDJField({ field: 'directJob_EntryNumber', value: result.data.result.Entry_Number }));
-                dispatch(setDJField({ field: 'directJob_VoucherNumber', value: result.data.result.Voucher_Number }));
-                setLoading(false);
-                // Router.push(`/accounts/directJob/${result.data.result.Voucher_Number}`);
-            }else{
-                const result = await axios.post(`${process.env.NEXT_PUBLIC_CLIMAX_MAIN_URL}/voucher/updateDirectJob`, { direct_Job, direct_Job_Association });
+    // const handleSave = async (edit) => {
+    //     try{
+    //         let companyId = Cookies.get('companyId')
+    //         let user = Cookies.get('username')
+    //         console.log("Saving", user)
+    //         let direct_Job = {
+    //             Entry_No: state.directJob_EntryNumber,
+    //             Entry_Date: state.directJob_EntryDate,
+    //             Type: state.directJob_Type,
+    //             Reference_No: state.directJob_Reference,
+    //             Operation: state.directJob_Operation,
+    //             Job_Type: state.directJob_JobType,
+    //             SubType: state.directJob_SubType,
+    //             Cheque_No: state.directJob_ChequeNo,
+    //             Cheque_Date: state.directJob_ChequeDate,
+    //             Currency: state.directJob_Currency,
+    //             Ex_Rate: state.directJob_Currency == 'PKR' ? 1 : state.directJob_JobType == 'single' ? state.directJob[0].ExRate: state.directJob_ExRate,
+    //             Tran_Mode: state.directJob_TransMode,
+    //             Drawn_At: state.directJob_DrawnAt,
+    //             Account_No: state.directJob_Account,
+    //             Paid_To: state.directJob_PaidTo,
+    //             Paid_Name: state.directJob_PaidTo ? state.directJob_CAccounts.find((x) => x.id == state.directJob_PaidTo).name : '',
+    //             Narration: state.directJob_Remarks,
+    //             companyId,
+    //             Add_By: user,
+    //         }
+    //         let direct_Job_Association = [];
+    //         for(let job of state.directJob){
+    //             direct_Job_Association.push({
+    //                 Job_No: job.JobNumber,
+    //                 File_No: job.FileNumber,
+    //                 Charge_Name: job.Charge,
+    //                 Basis: job.Basis,
+    //                 Rate_Group: job.RateGroup,
+    //                 Size_Type: job.SizeType,
+    //                 Quantity: job.Quantity,
+    //                 Currency: job.Currency,
+    //                 Ex_Rate: job.ExRate,
+    //                 Amount: job.Rate,
+    //                 Discount: job.Discount,
+    //                 Tax_Apply: job.TaxApply,
+    //                 Tax_Amount: job.TaxAmount,
+    //                 VAT_Catagory: job.VATCategory,
+    //                 Description: job.Description,
+    //                 Job_Id: job.JobId,
+    //             })
+    //         }
+    //         console.log("Direct Job to be saved", { direct_Job, direct_Job_Association })
+    //         if(!edit){
+    //             const result = axios.post(`${process.env.NEXT_PUBLIC_CLIMAX_MAIN_URL}/voucher/createDirectJob`,
+    //                 { direct_Job, direct_Job_Association }
+    //             ).then((x) => {
+    //                 dispatch(setDJField({ field: 'directJob_EntryNumber', value: x.data.result.Entry_Number }));
+    //                 dispatch(setDJField({ field: 'directJob_VoucherNumber', value: x.data.result.Voucher_Number }));
+    //                 console.log(x.data.result)
+    //                 Router.push(`/accounts/directJob/${x.data.result.id}`)
+    //                 setLoading(false);
+    //             }).catch((e) => {
+    //                 console.log(e)
+    //                 setLoading(false);
+    //                 openNotification('Error', 'Something went wrong', 'red');
+    //             });
+    //             // Router.push(`/accounts/directJob/${result.data.result.Voucher_Number}`);
+    //         }else{
+    //             const result = await axios.post(`${process.env.NEXT_PUBLIC_CLIMAX_MAIN_URL}/voucher/updateDirectJob`, { direct_Job, direct_Job_Association });
 
-            }
-        }catch(e){
-            console.log(e)
-        }
+    //         }
+    //     }catch(e){
+    //         console.log(e)
+    //     }
+    // }
+
+
+    const handleSave = async () => {
+  try {
+    setLoading(true);
+
+    const companyId = Cookies.get('companyId');
+    const user = Cookies.get('username');
+
+    let direct_Job = {
+        Entry_No: state.directJob_EntryNumber,
+        Entry_Date: state.directJob_EntryDate,
+        Type: state.directJob_Type,
+        Reference_No: state.directJob_Reference,
+        Operation: state.directJob_Operation,
+        Job_Type: state.directJob_JobType,
+        SubType: state.directJob_SubType,
+        Cheque_No: state.directJob_ChequeNo,
+        Cheque_Date: state.directJob_ChequeDate,
+        Currency: state.directJob_Currency,
+        Ex_Rate: state.directJob_Currency == 'PKR' ? 1 : state.directJob_JobType == 'single' ? state.directJob[0].ExRate: state.directJob_ExRate,
+        Tran_Mode: state.directJob_TransMode,
+        Drawn_At: state.directJob_DrawnAt,
+        Account_No: state.directJob_Account,
+        Paid_To: state.directJob_PaidTo,
+        Paid_Name: state.directJob_PaidTo ? state.directJob_CAccounts.find((x) => x.id == state.directJob_PaidTo).name : '',
+        Narration: state.directJob_Remarks,
+        companyId,
+        Add_By: user,
+    };
+
+    if(id && id != 'new'){
+        direct_Job.id = parseInt(state.directJob_Id)
+        direct_Job.Voucher_Id = parseInt(state.directJob_VoucherId)
     }
+
+    const direct_Job_Association = state.directJob.map(job => ({
+      Job_No: job.JobNumber,
+      File_No: job.FileNumber,
+      Charge_Name: job.Charge,
+      Basis: job.Basis,
+      Rate_Group: job.RateGroup,
+      Size_Type: job.SizeType,
+      Quantity: job.Quantity,
+      Currency: job.Currency,
+      Ex_Rate: job.ExRate,
+      Amount: job.Rate,
+      Discount: job.Discount,
+      Tax_Apply: job.TaxApply,
+      Tax_Amount: job.TaxAmount,
+      VAT_Catagory: job.VATCategory,
+      Description: job.Description,
+      Job_Id: job.JobId,
+    }));
+
+    console.log("Direct Job to be saved", { direct_Job, direct_Job_Association })
+
+    const result = await axios.post(
+      `${process.env.NEXT_PUBLIC_CLIMAX_MAIN_URL}/voucher/saveDirectJob`,
+      { direct_Job, direct_Job_Association }
+    );
+
+    openNotification('Success', state.directJob_Id ? 'Direct Job Updated' : 'Direct Job Created', 'green');
+    Router.push(`/accounts/directJob/${result.data.result.id}`);
+    setLoading(false);
+
+  } catch (e) {
+    console.log(e);
+    setLoading(false);
+    openNotification('Error', 'Something went wrong', 'red');
+  }
+};
 
     useEffect(() => {
         console.log("state.directJob", state.directJob)
@@ -117,7 +307,7 @@ const DirectJob = ({ id }) => {
     useEffect(() => {
     const getData = async () => {
         try {
-
+            console.log("Fetching Required Data")
         const res = await axios.get( process.env.NEXT_PUBLIC_CLIMAX_GET_ALL_CHILD_ACCOUNTS );
             const accounts = res?.data?.result || []; // only update if data exists
             if (accounts.length > 0) {
@@ -128,7 +318,7 @@ const DirectJob = ({ id }) => {
         if (accounts.length > 0) {
             dispatch(setDJField({ field: 'directJob_Charges', value: charges }));
         }
-
+        console.log("Fetched Required Data")
         const jobsRes = await axios.get(
             `${process.env.NEXT_PUBLIC_CLIMAX_MAIN_URL}/seaJob/getJobNumbers`,
             {
@@ -156,7 +346,7 @@ const DirectJob = ({ id }) => {
     };
 
     getData();
-    }, [currentPage, search]); // 🔥 re-fetch on search & page
+    }, [currentPage, search, id]); // 🔥 re-fetch on search & page
 
         useEffect(() => {
         const fetchreceivingAccount = async () => {
@@ -177,9 +367,10 @@ const DirectJob = ({ id }) => {
           }
         }
         fetchreceivingAccount()
-      }, [state.directJob_TransMode])
+      }, [state.directJob_TransMode, id])
 
-    console.log("Direct Job State", state)
+      console.log(state)
+
     return (
         <div className='base-page-layout'>
             <Row style={{ width: '100%', justifyContent: 'space-between', alignItems: 'end', borderBottom: '2px solid black', paddingBottom: '10px'}}>
@@ -196,14 +387,19 @@ const DirectJob = ({ id }) => {
                 <Col md={1} style={{textAlign: 'right'}}>
                     {id != 'new' && <Button
                         className="delete-btn1"
-                    >
-                        <DeleteOutlined className="delete-icon" style={{ color: '#1f2937', fontSize: '20px' }} />
+                        disabled={loading}
+                        onClick={() => {
+                                deleteData(state.directJob_Id)
+                        }}
+                    >   
+                        {loading && <LoadingOutlined className="delete-icon" style={{ color: '#1f2937', fontSize: '20px' }} />}
+                        {!loading && <DeleteOutlined className="delete-icon" style={{ color: '#1f2937', fontSize: '20px' }} />}
                     </Button>}
                 </Col>
                 <Col md={1} style={{textAlign: 'right'}}>
                     <Button
                         className="edit-btn1"
-                        // disabled={loading}
+                        disabled={loading}
                         onClick={() => {
                             setLoading(true)
                             if(state.directJob_EntryNumber){
@@ -217,20 +413,24 @@ const DirectJob = ({ id }) => {
                             // setShow(true)
                         }}
                     >
-                        <SaveOutlined className="edit-icon" style={{ color: '#1f2937', fontSize: '20px' }} />
+                        {loading && <LoadingOutlined className="delete-icon" style={{ color: '#1f2937', fontSize: '20px' }} />}
+                        {!loading && <SaveOutlined className="edit-icon" style={{ color: '#1f2937', fontSize: '20px' }} />}
                     </Button>
                 </Col>
                 <Col md={1} style={{textAlign: 'right'}}>
                     <Button
                         className="delete-btn1"
+                        disabled={loading}
                         onClick={() => {
                             // console.log("Reset Direct Job State")
                             // dispatch(resetDirectJob())
                             // dispatch(setDJField({ field: 'directJob_Id', value: 'new' }))
-                            setShow(true)
+                            // setShow(true)
+                            dispatch(resetDirectJob());
                         }}
                     >
-                        <WarningOutlined className="delete-icon" style={{ color: '#1f2937', fontSize: '20px' }} />
+                        {loading && <LoadingOutlined className="delete-icon" style={{ color: '#1f2937', fontSize: '20px' }} />}
+                        {!loading && <WarningOutlined className="delete-icon" style={{ color: '#1f2937', fontSize: '20px' }} />}
                     </Button>
                 </Col>
             </Row>
@@ -274,7 +474,7 @@ const DirectJob = ({ id }) => {
                 </Col>
                 <Col md={4}>
                     <label className="custom-label">Entry Date*</label>    
-                    <DatePicker format={'DD-MM-YYYY'} style={{width: '90%'}} value={state.directJob_EntryDate} onChange={(e) => {dispatch(setDJField({ field: 'directJob_EntryDate', value: e}))}}/>
+                    <DatePicker format={'DD-MM-YYYY'} style={{width: '90%'}} value={moment(state.directJob_EntryDate)} onChange={(e) => {dispatch(setDJField({ field: 'directJob_EntryDate', value: e}))}}/>
                     <label className="custom-label">Tran Mode*</label>
                     <Select style={{width: '90%'}} placeholder="Tran Mode" value={state.directJob_TransMode} onChange={(e) => {dispatch(setDJField({ field: 'directJob_TransMode', value: e}))}}>
                         <Select.Option value="Bank">Bank</Select.Option>
@@ -391,7 +591,7 @@ const DirectJob = ({ id }) => {
                                 <Select.Option value="other">Other</Select.Option>
                             </Select>
                             <label className="custom-label">Cheq Date*</label>
-                            <DatePicker format={'DD-MM-YYYY'} style={{width: '90%'}} value={state.directJob_ChequeDate} onChange={(e) => {dispatch(setDJField({ field: 'directJob_ChequeDate', value: e}))}}/>
+                            <DatePicker format={'DD-MM-YYYY'} style={{width: '90%'}} value={moment(state.directJob_ChequeDate)} onChange={(e) => {dispatch(setDJField({ field: 'directJob_ChequeDate', value: e}))}}/>
                         </Col>
                         <Col md={12}>
                             <label className="custom-label">Job Type*</label>
@@ -469,7 +669,7 @@ const DirectJob = ({ id }) => {
                                             FileNumber: '',
                                             Basis: '',
                                             Currency: 'PKR',
-                                            RateGroup: '',
+                                            RateGroup: 'None',
                                             SizeType: '',
                                             Quantity: 0.0,
                                             Rate: 0.0,
@@ -563,7 +763,7 @@ const DirectJob = ({ id }) => {
                                     <Select
                                     showSearch
                                     optionFilterProp="children"
-                                    value={item.charge}
+                                    value={item.Charge}
                                     style={{ width: '90%' }}
                                     placeholder="Charges Name..."
                                     onChange={(value, option) => {

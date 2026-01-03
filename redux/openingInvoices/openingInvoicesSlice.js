@@ -10,8 +10,8 @@ import moment from 'moment';
     ex_rate: 1.0,
     total: 0,
     createdAt: moment().month() < 6 
-  ? moment().subtract(1, 'year').startOf('year').month(5).endOf('month')
-  : moment().startOf('year').month(5).endOf('month'),
+  ? moment().subtract(1, 'year').startOf('year').month(5).endOf('month').toISOString()
+  : moment().startOf('year').month(5).endOf('month').toISOString(),
     accounts: [],
     account: undefined,
     accountType: "client",
