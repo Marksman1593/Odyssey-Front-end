@@ -96,7 +96,7 @@ const CreateOrEdit = ({state, dispatch, companyId, jobData, id, type, refetch}) 
   useEffect(() => {
   if (!state.selectedRecord) return; // ✅ don't run unnecessarily
 
-  console.log("This is running");
+  // console.log("This is running");
 
   // Build base tempState
   let tempState = { ...baseValues, ...jobData };

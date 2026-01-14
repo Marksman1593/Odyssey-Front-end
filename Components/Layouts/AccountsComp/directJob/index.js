@@ -31,8 +31,8 @@ const DirectJob = ({ id }) => {
                 );
                 console.log("Data Fetched", res.data.result)
                 dispatch(resetDirectJob());
-                dispatch(setDJField({ field: "directJob_Id", value: parseInt(res.data.result.id) }));
-                dispatch(setDJField({ field: "directJob_Account", value: parseInt(res.data.result.Account_No) }));
+                dispatch(setDJField({ field: "directJob_Id", value: res.data.result.id.toString() }));
+                dispatch(setDJField({ field: "directJob_Account", value: res.data.result.Account_No.toString() }));
                 dispatch(setDJField({ field: "directJob_ChequeDate", value: res.data.result.Cheque_Date }));
                 dispatch(setDJField({ field: "directJob_ChequeNo", value: res.data.result.Cheque_No }));
                 dispatch(setDJField({ field: "directJob_Currency", value: res.data.result.Currency }));
@@ -41,7 +41,7 @@ const DirectJob = ({ id }) => {
                 dispatch(setDJField({ field: "directJob_ExRate", value: res.data.result.Ex_Rate }));
                 dispatch(setDJField({ field: "directJob_JobType", value: res.data.result.Job_Type }));
                 dispatch(setDJField({ field: "directJob_Operation", value: res.data.result.Operation }));
-                dispatch(setDJField({ field: "directJob_PaidTo", value: res.data.result.Paid_To }));
+                dispatch(setDJField({ field: "directJob_PaidTo", value: res.data.result.Paid_To.toString() }));
                 dispatch(setDJField({ field: "directJob_Reference", value: res.data.result.Reference_No }));
                 dispatch(setDJField({ field: "directJob_SubType", value: res.data.result.SubType }));
                 dispatch(setDJField({ field: "directJob_EntryDate", value: res.data.result.Entry_Date }));
@@ -83,10 +83,10 @@ const DirectJob = ({ id }) => {
             }
         }
 
-        if(state.directJob_CAccounts.length > 0 && id != null){
+        if(state.directJob_Charges.length > 0 && id != null){
             fetchData();
         }
-    }, [id, state.directJob_CAccounts])
+    }, [id, state.directJob_Charges ])
 
     const deleteData = async (id) => {
         try {
@@ -315,7 +315,7 @@ const DirectJob = ({ id }) => {
         }
         const result = await axios.get( process.env.NEXT_PUBLIC_CLIMAX_GET_ALL_CHARGES );
         const charges = result?.data?.result || []; // only update if data exists
-        if (accounts.length > 0) {
+        if (charges.length > 0) {
             dispatch(setDJField({ field: 'directJob_Charges', value: charges }));
         }
         console.log("Fetched Required Data")
@@ -346,7 +346,7 @@ const DirectJob = ({ id }) => {
     };
 
     getData();
-    }, [currentPage, search, id]); // 🔥 re-fetch on search & page
+    }, [currentPage, search]); // 🔥 re-fetch on search & page
 
         useEffect(() => {
         const fetchreceivingAccount = async () => {
@@ -367,7 +367,7 @@ const DirectJob = ({ id }) => {
           }
         }
         fetchreceivingAccount()
-      }, [state.directJob_TransMode, id])
+      }, [state.directJob_TransMode])
 
       console.log(state)
 
@@ -562,7 +562,7 @@ const DirectJob = ({ id }) => {
                     </Row>
                     <Col md={24} style={{padding: '0'}}>
                             <label className="custom-label">Account #</label>
-                            <Select
+                            {state.directJob_SettlementAccounts.length > 0 && <Select
                                 showSearch
                                 optionFilterProp="children"
                                 style={{ width: '95%' }}
@@ -577,7 +577,7 @@ const DirectJob = ({ id }) => {
                                     {`${item.title} - ${item.code}`}
                                     </Select.Option>
                                 ))}
-                            </Select>
+                            </Select>}
                         <Row>
                         </Row>
                     </Col>
@@ -625,7 +625,7 @@ const DirectJob = ({ id }) => {
                     </Row>
                     <Col md={24} style={{padding: '0'}}>
                             <label className="custom-label">Paid to</label>
-                            <Select
+                            {state.directJob_CAccounts.length > 0 && <Select
                                 showSearch
                                 optionFilterProp="children"
                                 style={{ width: '95%' }}
@@ -640,7 +640,7 @@ const DirectJob = ({ id }) => {
                                     {`${item.title} - ${item.code}`}
                                     </Select.Option>
                                 ))}
-                            </Select>
+                            </Select>}
                         <Row>
                         </Row>
                     </Col>
@@ -760,7 +760,7 @@ const DirectJob = ({ id }) => {
                                     >{item.JobNumber}</div>
                                 </td>
                                 <td className="table-row">
-                                    <Select
+                                    {state.directJob_Charges.length > 0 && <Select
                                     showSearch
                                     optionFilterProp="children"
                                     value={item.Charge}
@@ -797,7 +797,7 @@ const DirectJob = ({ id }) => {
                                         {`(${charge.code}) - ${charge.name} - ${charge.short}`}
                                         </Select.Option>
                                     ))}
-                                    </Select>
+                                    </Select>}
                                     </td>
                                 <td className="table-row"><Input  value={item.FileNumber} onChange={(e) => {dispatch(updateDirectJobItem({ index: index, field: 'FileNumber', value: e.target.value}))}} style={{ width: '90%' }} placeholder="File #"/></td>
                                 <td className="table-row"><Select value={item.Basis} onChange={(e) => {dispatch(updateDirectJobItem({ index: index, field: 'Basis', value: e}))}} style={{ width: '90%' }} placeholder="Basis...">

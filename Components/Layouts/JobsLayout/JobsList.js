@@ -70,7 +70,7 @@ const SEJobList = ({ jobsData, sessionData, type }) => {
         `${process.env.NEXT_PUBLIC_CLIMAX_MAIN_URL}/seaJob/getCounts`,
         { data } // data goes in the body
       );
-      console.log("Result:", result.data.result);
+      // console.log("Result:", result.data.result);
       setRecords(result.data.result);
     }
   };
