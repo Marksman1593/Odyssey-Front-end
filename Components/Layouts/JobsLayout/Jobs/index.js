@@ -32,7 +32,7 @@ const SeJob = ({id, type}) => {
           ...newdata.result,
         }
       }
-      console.log("Temp", temp)
+      // console.log("Temp", temp)
       dispatch({type:'set',
         payload:{
           fields:data.result,

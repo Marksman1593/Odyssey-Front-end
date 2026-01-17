@@ -73,10 +73,6 @@ const BookingInfo = ({ handleSubmit, onEdit, companyId, register, control, error
     }
   }, [allValues.freightType])
 
-  useEffect(() => {
-    console.log("Type:", type)
-  }, [type])
-
   const handleOk = () => {
     allValues.approved = approved
     handleSubmit(onEdit(allValues))
@@ -148,10 +144,10 @@ const BookingInfo = ({ handleSubmit, onEdit, companyId, register, control, error
   };
 
   useEffect(()=>{
-    console.log("Shipping Line ID:", shippingLineId, typeof(shippingLineId), state.selectedRecord.shippingLineId, typeof(state.selectedRecord.shippingLineId))
-    if(typeof(shippingLineId)=='number'){
-      console.log("Running Dispatch")
-    }
+    // console.log("Shipping Line ID:", shippingLineId, typeof(shippingLineId), state.selectedRecord.shippingLineId, typeof(state.selectedRecord.shippingLineId))
+    // if(typeof(shippingLineId)=='number'){
+    //   console.log("Running Dispatch")
+    // }
     dispatch({
       type: "set", payload: {
         shippingLineId: parseInt(state.selectedRecord.shippingLineId),
@@ -160,7 +156,7 @@ const BookingInfo = ({ handleSubmit, onEdit, companyId, register, control, error
     })
   },[shippingLineId])
 
-  console.log(state)
+  // console.log(state)
 
 
   const ShipperComp = () => {

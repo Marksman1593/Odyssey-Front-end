@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'; // <-- use this in Next.js 13+
 import VannaChat from './VannaChat';
 import UploadBackUp from './UploadBackUp';
 import Cookies from 'js-cookie';
+import OllamaChat from './ollama';
 
 const Main = ({ sessionData, chartData }) => {
   const router = useRouter(); // get the router
@@ -20,9 +21,16 @@ const Main = ({ sessionData, chartData }) => {
     // ws.onclose = () => console.log("closed");
   }, [sessionData, router]);
 
+  const ollama = async () => {
+    const reply = await ollama();
+    console.log(reply)
+  } 
+
+
   return (
     <div className="base-page-layout">
       {/* {username == 'Saad' && <VannaChat /> } */}
+      <OllamaChat/>
       {/* {username == 'Saad' && <UploadBackUp /> } */}
     </div>
   );

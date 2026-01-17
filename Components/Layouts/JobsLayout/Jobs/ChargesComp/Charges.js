@@ -343,10 +343,10 @@ const ChargesList = ({state, dispatch, type, append, reset, fields, chargeList, 
                 console.log("Check:", check)
 
                 state.fields.chargeList.forEach(async (y, i) => {
-                  if (y.code == e) {
+                  if (y.id == e) {
                     tempChargeList[index] = {
                       ...tempChargeList[index],
-                      charge: e,
+                      charge: y.id,
                       particular: y.name,
                       basis: y.calculationType,
                       taxPerc: y.taxApply == "Yes" ? parseFloat(y.taxPerc) : 0.00,

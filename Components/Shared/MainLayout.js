@@ -454,39 +454,69 @@ const MainLayout = ({children}) => {
     else if(x.key=='7-8'){ Router.push(`/airJobs/manifest/${setKey(x)}`) } //these routes are also settled in 2nd useEffect
   };
 
-  const removeTab = (index) => {
-    console.log("Remove Tab>>", index)
-    if(index == '3-4'){
-      dispatch(resetState())
-    }
-    if(index == '5-5'){
-      dispatch(ledgerReset())
-    }
-    if(index == '3-12'){
-      dispatch(resetOpeningInvoice())
-    }
-    if(index == '3-5'){
-      dispatch(resetVouchers())
-    }
-    if(index == '3-15'){
-      dispatch(resetDirectJob())
-    }
-    let tempTabs = [...tabItems];
-    tempTabs = tempTabs.filter((x)=>{
-      return x.key!=index
-    })
-    // console.log("MainLayout>>",tempTabs)
-    dispatch(setTab(tempTabs))
-    if(toggleState==index){
-      setToggleState(0)
-    }
-    if(tempTabs.length==0){
-      Router.push('/') 
-    }else{
-      // console.log(tempTabs[tempTabs.length-1].key)
-      toggleTab(tempTabs[tempTabs.length-1])
-    }
-  };
+  // const removeTab = (index) => {
+  //   console.log("Remove Tab>>", index)
+  //   if(index == '3-4'){
+  //     dispatch(resetState())
+  //   }
+  //   if(index == '5-5'){
+  //     dispatch(ledgerReset())
+  //   }
+  //   if(index == '3-12'){
+  //     dispatch(resetOpeningInvoice())
+  //   }
+  //   if(index == '3-5'){
+  //     dispatch(resetVouchers())
+  //   }
+  //   if(index == '3-15'){
+  //     dispatch(resetDirectJob())
+  //   }
+  //   let tempTabs = [...tabItems];
+  //   tempTabs = tempTabs.filter((x)=>{
+  //     return x.key!=index
+  //   })
+  //   console.log("MainLayout>>",tempTabs)
+  //   dispatch(setTab(tempTabs))
+  //   if(toggleState==index){
+  //     setToggleState(0)
+  //   }
+  //   if(tempTabs.length==0){
+  //     Router.push('/') 
+  //   }else{
+  //     // console.log(tempTabs[tempTabs.length-1].key)
+  //     toggleTab(tempTabs[tempTabs.length-1])
+  //   }
+  // };
+
+  const removeTab = (key) => {
+  if (key === '3-4') dispatch(resetState())
+  if (key === '5-5') dispatch(ledgerReset())
+  if (key === '3-12') dispatch(resetOpeningInvoice())
+  if (key === '3-5') dispatch(resetVouchers())
+  if (key === '3-15') dispatch(resetDirectJob())
+
+  const currentIndex = tabItems.findIndex(tab => tab.key === key)
+  const newTabs = tabItems.filter(tab => tab.key !== key)
+
+  dispatch(setTab(newTabs))
+
+  // No tabs left
+  if (newTabs.length === 0) {
+    Router.push('/')
+    return
+  }
+
+  // If removed tab was active → select next logical tab
+  if (toggleState === key) {
+    const nextTab =
+      newTabs[currentIndex] || newTabs[currentIndex - 1]
+
+    setToggleState(nextTab.key)
+    toggleTab(nextTab)
+  }
+  // If removed tab was NOT active → do nothing
+}
+
 
   const searchPages = (e) => {
     let item;
